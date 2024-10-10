@@ -41,11 +41,8 @@ public:
     // 正运动学，轮速->底盘状态
     virtual void fkine(void);
 
-    // 发布电机控制命令
-    virtual void Publish(void);
-
-    // 接收控制指令
-    virtual void GetCmd(void);
+    // 底盘相关处理
+    virtual void handle(void);
 
     // 底盘旋转控制
     virtual void RotateControl(void);
