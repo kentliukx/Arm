@@ -1,0 +1,62 @@
+//
+// Created by 98383 on 24-10-8.
+//
+
+#ifndef CHASSIS25_CHASSIS_H
+#define CHASSIS25_CHASSIS_H
+
+#include <cstdint>
+
+typedef struct ChassisStatus {
+    float vx = 0;  // x方向速度(m/s)
+    float vy = 0;  // y方向速度(m/s)
+    float wz = 0;  // 旋转角速度(rad/s)
+    float angle = 0;  // 底盘角度(rad)(yaw电机角度-相对，陀螺仪角度-绝对)
+} ChassisStatus_t;
+
+class Chassis {
+protected:
+    // 目标状态(机器人坐标系)
+    ChassisStatus_t ref_;
+    // 反馈状态(机器人坐标系)
+    ChassisStatus_t fdb_;
+    // 目标状态(底盘坐标系)
+    ChassisStatus_t chassis_ref_;
+    // 反馈状态(底盘坐标系)
+    ChassisStatus_t chassis_fdb_;
+
+    uint8_t chassis_lock = 0; // 0锁定底盘, 1解锁
+public:
+    enum ChassisMode_e {
+        Separate, // 云台底盘分离
+        Follow, // 底盘跟随云台
+        Gyro, // 陀螺
+        Twist, // 扭腰
+        GyroChange, // 变速陀螺
+    } mode_;
+
+    // 逆运动学，底盘状态->轮速
+    virtual void ikine(void);
+
+    // 正运动学，轮速->底盘状态
+    virtual void fkine(void);
+
+    // 发布电机控制命令
+    virtual void Publish(void);
+
+    // 接收控制指令
+    virtual void GetCmd(void);
+
+    // 底盘旋转控制
+    virtual void RotateControl(void);
+
+    // 设置速度
+    void SetVx(float vx_);
+    void SetVy(float vy_);
+    void SetWz(float wz_);
+
+    void SetSpeed(float vx_, float vy_, float wz_);
+
+};
+
+#endif//CHASSIS25_CHASSIS_H
