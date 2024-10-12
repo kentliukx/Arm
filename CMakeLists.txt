@@ -68,6 +68,8 @@ file(GLOB_RECURSE libs "lib/*.a")
 # submodules
 add_subdirectory(algorithm)
 target_link_libraries(algorithm ${libs} ${mcu}_driver)
+add_subdirectory(common)
+target_link_libraries(common ${libs} ${mcu}_driver base algorithm)
 add_subdirectory(base)
 target_link_libraries(base ${libs} ${mcu}_driver algorithm)
 add_subdirectory(app)
