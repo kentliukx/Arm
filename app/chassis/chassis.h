@@ -47,10 +47,12 @@ public:
     // 底盘旋转控制
     virtual void RotateControl(void);
 
+protected:
     // 设置速度
     void SetVx(float vx_);
     void SetVy(float vy_);
     void SetWz(float wz_);
+    void SetAngle(float angle_);
 
     void SetSpeed(float vx_, float vy_, float wz_);
 
