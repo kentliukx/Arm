@@ -50,6 +50,8 @@ namespace math {
    // 角度规范化(rad->[-PI,PI], deg->[-180,180])
    float radNormalizePI(const float& angle);
    float degNormalize180(const float& angle);
+   // 判断浮点数相等
+   bool float_equal(float x, float y);
 
 }  // namespace math
 

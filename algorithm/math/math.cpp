@@ -11,6 +11,7 @@
 
 #include "math.h"
 #include "lib/arm_math/arm_math.h"
+#include <cmath>
 
 // Value limitation
 // 限幅
@@ -126,4 +127,8 @@ float math::radNormalizePI(const float& angle) {
 
 float math::degNormalize180(const float& angle) {
    return math::loopLimit(angle, -180.f, 180.f);
+}
+
+bool math::float_equal(float x, float y) {
+    return (std::abs(x - y) < 0.001f);
 }
