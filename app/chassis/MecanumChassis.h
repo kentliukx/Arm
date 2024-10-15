@@ -9,6 +9,7 @@
 #include "algorithm/pid/pid.h"
 #include "algorithm/math/math.h"
 #include "cmath"
+#include "common/message_center/message_center.h"
 
 struct WheelSpeed {
     float fl;
@@ -25,6 +26,10 @@ private:
     WheelSpeed wheel_ref_;
     // 底盘跟随PID
     PID angle_pid;
+    // 底盘反馈发布者
+    Publisher_t chassis_pub_;
+    // 底盘命令接收者
+    Subscriber_t chassis_sub_;
 
     float x_bias; // x方向偏移 (底盘前方为正方向) (m)
     float y_bias; // y方向偏移 (底盘左方为正方向) (m)
