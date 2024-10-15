@@ -4,6 +4,11 @@
 
 #include "MecanumChassis.h"
 
+MecanumChassis::MecanumChassis() {
+    chassis_pub_ = PubRegister("chassis_cmd", sizeof(ChassisCtrlCmd));
+    chassis_sub_ = SubRegister("chassis_fdb", sizeof(ChassisCtrlCmd));
+}
+
 void MecanumChassis::ikine(void) {
     // 机器人坐标系目标状态->底盘坐标系目标状态
     chassis_ref_.vx = ref_.vx * cosf(math::deg2rad(fdb_.angle)) +
@@ -50,10 +55,29 @@ void MecanumChassis::fkine(void) {
 }
 
 void MecanumChassis::handle(void) {
-    // 获取电机反馈数据
-    // SubGetMessage();
+    // 获取控制数据
+    SubGetMessage(chassis_sub_, &chassis_cmd_rcv_);
+    SetSpeed(chassis_cmd_rcv_.vx, chassis_cmd_rcv_.vy, chassis_cmd_rcv_.wz);
+    SetAngle(chassis_cmd_rcv_.ref_angle);
+    mode_ = chassis_cmd_rcv_.mode_;
+
+    RotateControl(chassis_cmd_rcv_.fdb_angle, chassis_cmd_rcv_.follow_fdb_angle);
+    /* 电机更新反馈
+     *
+     */
+    fkine();
+
+    ikine();
+    /* 给出电机控制值
+     *
+     */
 }
 
-void MecanumChassis::RotateControl(void) {
-
+void MecanumChassis::RotateControl(float fdb_angle, float follow_fdb_angle) {
+    fdb_.angle = fdb_angle;
+    if (mode_ == ChassisMode_e::Follow) {
+        ref_.wz = math::deadBand(angle_pid_.calc(ref_.angle, follow_fdb_angle), -5, 5);
+    } else
+    if (mode_ == ChassisMode_e::Gyro || mode_ == ChassisMode_e::GyroChange){
+    }
 }
