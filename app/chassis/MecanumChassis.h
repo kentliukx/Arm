@@ -10,6 +10,7 @@
 #include "algorithm/math/math.h"
 #include "cmath"
 #include "common/message_center/message_center.h"
+#include "common/message_center/msg_def.h"
 
 struct WheelSpeed {
     float fl;
@@ -27,9 +28,11 @@ private:
     // 底盘跟随PID
     PID angle_pid;
     // 底盘反馈发布者
-    Publisher_t chassis_pub_;
+    Publisher_t* chassis_pub_;
     // 底盘命令接收者
-    Subscriber_t chassis_sub_;
+    Subscriber_t* chassis_sub_;
+    // 底盘接收数据指针
+    ChassisCtrlCmd chassis_cmd_rcv_;
 
     float x_bias; // x方向偏移 (底盘前方为正方向) (m)
     float y_bias; // y方向偏移 (底盘左方为正方向) (m)
@@ -37,6 +40,8 @@ private:
     float half_track_width; // 1/2轴距 (m)
     float half_wheel_base; // 1/2轮距 (m)
 public:
+    // 构造函数
+    MecanumChassis();
     // 底盘角速度前馈
     float feedforward_wz;
 
