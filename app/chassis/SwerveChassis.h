@@ -73,6 +73,9 @@ private:
 
     // 底盘旋转控制
     void RotateControl(float fdb_angle, float follow_fdb_angle) override;
+
+    // 坐标系转换
+    void CoordinateTransformation(void);
 };
 
 #endif//RM_FRAME_SWERVECHASSIS_H
