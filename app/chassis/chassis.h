@@ -14,6 +14,14 @@ typedef struct ChassisStatus {
     float angle = 0;  // 底盘角度(rad)(yaw电机角度-相对，陀螺仪角度-绝对)
 } ChassisStatus_t;
 
+enum ChassisMode_e {
+    Separate, // 云台底盘分离
+    Follow, // 底盘跟随云台
+    Gyro, // 陀螺
+    Twist, // 扭腰
+    GyroChange, // 变速陀螺
+};
+
 class Chassis {
 protected:
     // 目标状态(机器人坐标系)
@@ -27,13 +35,7 @@ protected:
 
     uint8_t chassis_lock = 0; // 0锁定底盘, 1解锁
 public:
-    enum ChassisMode_e {
-        Separate, // 云台底盘分离
-        Follow, // 底盘跟随云台
-        Gyro, // 陀螺
-        Twist, // 扭腰
-        GyroChange, // 变速陀螺
-    } mode_;
+    ChassisMode_e mode_;
 
     // 逆运动学，底盘状态->轮速
     virtual void ikine(void);
