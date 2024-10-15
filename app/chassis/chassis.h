@@ -47,7 +47,7 @@ public:
     virtual void handle(void);
 
     // 底盘旋转控制
-    virtual void RotateControl(void);
+    virtual void RotateControl(float fdb_angle, float follow_fdb_angle);
 
 protected:
     // 设置速度

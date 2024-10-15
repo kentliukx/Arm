@@ -26,7 +26,7 @@ private:
     // 轮速目标值
     WheelSpeed wheel_ref_;
     // 底盘跟随PID
-    PID angle_pid;
+    PID angle_pid_;
     // 底盘反馈发布者
     Publisher_t* chassis_pub_;
     // 底盘命令接收者
@@ -59,7 +59,7 @@ public:
     void handle(void) override;
 
     // 底盘旋转控制
-    void RotateControl(void) override;
+    void RotateControl(float fdb_angle, float follow_fdb_angle) override;
 
 };
 
