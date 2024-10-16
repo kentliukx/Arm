@@ -57,11 +57,14 @@ void MecanumChassis::fkine(void) {
 }
 
 void MecanumChassis::handle(void) {
-  // 获取控制数据
-  SubGetMessage(chassis_sub_, &chassis_cmd_rcv_);
-  SetSpeed(chassis_cmd_rcv_.vx, chassis_cmd_rcv_.vy, chassis_cmd_rcv_.wz);
-  SetAngle(chassis_cmd_rcv_.ref_angle);
-  mode_ = chassis_cmd_rcv_.mode_;
+    // 获取控制数据
+    SubGetMessage(chassis_sub_, &chassis_cmd_rcv_);
+    SetSpeed(chassis_cmd_rcv_.vx, chassis_cmd_rcv_.vy, chassis_cmd_rcv_.wz);
+    SetAngle(chassis_cmd_rcv_.ref_angle);
+    if (mode_ != chassis_cmd_rcv_.mode_) {
+      LOGINFO("Set chassis mode from %d to %d", mode_, chassis_cmd_rcv_.mode_);
+      mode_ = chassis_cmd_rcv_.mode_;
+    }
 
   RotateControl();
   /* 电机更新反馈

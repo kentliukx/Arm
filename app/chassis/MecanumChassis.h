@@ -12,6 +12,7 @@
 #include "common/message_center/message_center.h"
 #include "common/message_center/msg_def.h"
 #include "stm32f4xx_hal.h"
+#include "common/log/bsp_log.h"
 
 struct WheelSpeed {
     float fl;
