@@ -38,7 +38,7 @@ typedef enum CANRxError {
 typedef struct RawData {
   int16_t ecd;               // encoder value(0~8191) 编码器值(0~8191)
   int16_t rotate_speed_rpm;  // rotational speed(rpm) 转速(单位rpm)
-  int16_t current;      // torque current 转矩电流
+  int16_t current;           // torque current 转矩电流
   int8_t temp;               // temperature 温度
 } RawData_t;
 

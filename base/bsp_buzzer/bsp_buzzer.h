@@ -54,31 +54,31 @@
 #define H7 1976
 
 typedef struct MusicNote {
-   uint16_t note;
-   uint32_t time;
+  uint16_t note;
+  uint32_t time;
 } MusicNote_t;
 
 // music notes of Super Mario
 const MusicNote_t music_super_mario[] = {
-       {H3, 100}, {0, 50}, {H3, 250}, {0, 50},   {H3, 100}, {0, 50}, {0, 150},
-       {H1, 100}, {0, 50}, {H3, 250}, {0, 50},   {H5, 250}, {0, 50}, {0, 300},
-       {M5, 250}, {0, 50}, {0, 200},  {H1, 300}, {0, 50}};
+    {H3, 100}, {0, 50}, {H3, 250}, {0, 50},   {H3, 100}, {0, 50}, {0, 150},
+    {H1, 100}, {0, 50}, {H3, 250}, {0, 50},   {H5, 250}, {0, 50}, {0, 300},
+    {M5, 250}, {0, 50}, {0, 200},  {H1, 300}, {0, 50}};
 
 #if (defined DBC) or (defined DBA)
 
 class BoardBuzzer {
-public:
-   BoardBuzzer(void);
+ public:
+  BoardBuzzer(void);
 
-   void init(void);
-   void playNote(MusicNote_t note);
-   void playMusic(const MusicNote_t* notes, uint16_t len);
+  void init(void);
+  void playNote(MusicNote_t note);
+  void playMusic(const MusicNote_t* notes, uint16_t len);
 
-private:
-   TIM_HandleTypeDef* htim_;
-   uint32_t ch_;
-   MusicNote_t note_;
-   uint32_t stop_tick_;
+ private:
+  TIM_HandleTypeDef* htim_;
+  uint32_t ch_;
+  MusicNote_t note_;
+  uint32_t stop_tick_;
 };
 
 #endif
