@@ -20,6 +20,7 @@ enum ChassisMode_e {
     Gyro, // 陀螺
     Twist, // 扭腰
     GyroChange, // 变速陀螺
+    RevGyro, // 反向自转
 };
 
 class Chassis {
