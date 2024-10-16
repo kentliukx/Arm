@@ -13,7 +13,8 @@ typedef struct {
     float wz; // 旋转角
     float ref_angle; // 底盘角度
 
-    float fdb_angle, follow_fdb_angle;
+    float fdb_angle, follow_fdb_angle; // 底盘反馈角度和跟随角度
+    float chassis_power_limit, extra_power_max; // 功率限制参数
     ChassisMode_e mode_; // 底盘模式
 } ChassisCtrlCmd;
 
