@@ -20,19 +20,19 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_FLAGS "-std=c99")
 
 # optimize level
-if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-  message(STATUS "Maximum optimization for speed")
-  add_compile_options(-Ofast)
-elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
-  message(STATUS "Maximum optimization for speed, debug info included")
-  add_compile_options(-Ofast -g)
-elseif("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
-  message(STATUS "Maximum optimization for size")
-  add_compile_options(-Os)
-else()
-  message(STATUS "Minimal optimization, debug info included")
-  add_compile_options(-Og -g)
-endif()
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+    message(STATUS "Maximum optimization for speed")
+    add_compile_options(-Ofast)
+elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
+    message(STATUS "Maximum optimization for speed, debug info included")
+    add_compile_options(-Ofast -g)
+elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
+    message(STATUS "Maximum optimization for size")
+    add_compile_options(-Os)
+else ()
+    message(STATUS "Minimal optimization, debug info included")
+    add_compile_options(-Og -g)
+endif ()
 
 project(RM_frame C CXX ASM)
 
@@ -43,21 +43,21 @@ message(STATUS "MCU: ${mcu}")
 # mcu subdirectory
 add_subdirectory(mcu/${mcu})
 
-if("${CMAKE_PRINT_COMPILE_OPTION}" STREQUAL "true")
-  message(STATUS "defintions:\n   ${mcu_def}")
-  message(STATUS "include_directories:\n   mcu/${mcu};")
+if ("${CMAKE_PRINT_COMPILE_OPTION}" STREQUAL "true")
+    message(STATUS "defintions:\n   ${mcu_def}")
+    message(STATUS "include_directories:\n   mcu/${mcu};")
 
-  foreach(directory ${mcu_include})
-    message("   mcu/${mcu}/${directory};")
-  endforeach(directory)
-endif()
+    foreach (directory ${mcu_include})
+        message("   mcu/${mcu}/${directory};")
+    endforeach (directory)
+endif ()
 
 add_definitions(${mcu_def})
 include_directories(${CMAKE_SOURCE_DIR} mcu/${mcu})
 
-foreach(directory ${mcu_include})
-  include_directories(mcu/${mcu}/${directory})
-endforeach(directory)
+foreach (directory ${mcu_include})
+    include_directories(mcu/${mcu}/${directory})
+endforeach (directory)
 
 add_compile_options(${mcu_compile_options})
 add_link_options(${mcu_link_options})
@@ -70,6 +70,8 @@ add_subdirectory(algorithm)
 target_link_libraries(algorithm ${libs} ${mcu}_driver)
 add_subdirectory(common)
 target_link_libraries(common ${libs} ${mcu}_driver base algorithm)
+add_subdirectory(driver)
+target_link_libraries(driver ${libs} ${mcu}_driver base algorithm)
 add_subdirectory(base)
 target_link_libraries(base ${libs} ${mcu}_driver algorithm)
 add_subdirectory(app)
@@ -86,7 +88,7 @@ set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 
 add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
-  COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${PROJECT_NAME}.elf> ${HEX_FILE}
-  COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}.elf> ${BIN_FILE}
-  COMMENT "Building ${HEX_FILE}\nBuilding ${BIN_FILE}"
+        COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${PROJECT_NAME}.elf> ${HEX_FILE}
+        COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}.elf> ${BIN_FILE}
+        COMMENT "Building ${HEX_FILE}\nBuilding ${BIN_FILE}"
 )
