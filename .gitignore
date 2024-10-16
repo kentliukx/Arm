@@ -2,14 +2,15 @@
 *build*
 
 # VSCode
-.vscode/.cortex-debug*
+.vscode/
 
 # CLion
+.idea/
 
 # MDK-ARM
 .MDK-ARM
-*DebugConfig*
-*RTE*
+DebugConfig
+RTE
 *uvguix*
 
 *.o
