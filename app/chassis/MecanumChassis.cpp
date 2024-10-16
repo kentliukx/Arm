@@ -78,6 +78,15 @@ void MecanumChassis::RotateControl(float fdb_angle, float follow_fdb_angle) {
     if (mode_ == ChassisMode_e::Follow) {
         ref_.wz = math::deadBand(angle_pid_.calc(ref_.angle, follow_fdb_angle), -5, 5);
     } else
-    if (mode_ == ChassisMode_e::Gyro || mode_ == ChassisMode_e::GyroChange){
+    if (mode_ == ChassisMode_e::Gyro){
+        ref_.wz = 450;
+    } else
+    if (mode_ == ChassisMode_e::GyroChange) {
+        float dice = sinf(HAL_GetTick() / 100.f);
+        ref_.wz = 450;
+        if (dice >= 0) ref_.wz = 250;
+    } else
+    if (mode_ == ChassisMode_e::Twist) {
+        ref_.wz = 480 * sin(HAL_GetTick() * 6e-3f);
     }
 }
