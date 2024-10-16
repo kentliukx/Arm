@@ -144,24 +144,26 @@ void SwerveChassis::handle(void) {
 }
 
 void SwerveChassis::RotateControl(void) {
+    fdb_spd.angle = chassis_cmd_rcv_.fdb_angle;
+    float total_power = chassis_cmd_rcv_.chassis_power_limit + chassis_cmd_rcv_.extra_power_max;
     switch (mode_) {
         case ChassisMode_e::Separate: {
             chassis_ref_spd_.wz = 0;
             break;
         }
         case ChassisMode_e::Follow: {
-            chassis_ref_spd_.wz = follow_filter_.update(
-                    follow_control_.calc(0, feedback_robot_.gimbal_chassis_angle));
+            chassis_ref_spd_.wz = math::deadBand(
+                    angle_pid_.calc(ref_spd.angle, chassis_cmd_rcv_.follow_fdb_angle), -5, 5);;
             break;
         }
-        case ChassisMode::TOP: {
+        case ChassisMode_e::Gyro: {
             // 50W: 100rpm
             // 200W: 150rpm
-            target_chassis_.wz = (total_power - 50.0f) / 3.0f + 100.0f;
+            chassis_ref_spd_.wz = (total_power - 50.0f) / 3.0f + 100.0f;
             break;
         }
-        case ChassisMode::ANTI_TOP:{
-            target_chassis_.wz = -(total_power - 50.0f) / 3.0f - 100.0f;
+        case ChassisMode_e::RevGyro:{
+            chassis_ref_spd_.wz = -(total_power - 50.0f) / 3.0f - 100.0f;
             break;
         }
     }
