@@ -5,15 +5,15 @@
 #include "chassis.h"
 
 void Chassis::SetVx(float vx_) { // 考虑加低通滤波
-    ref_.vx = vx_;
+    ref_spd.vx = vx_;
 }
 
 void Chassis::SetVy(float vy_) {
-    ref_.vy = vy_;
+    ref_spd.vy = vy_;
 }
 
 void Chassis::SetWz(float wz_) {
-    ref_.wz = wz_;
+    ref_spd.wz = wz_;
 }
 
 void Chassis::SetSpeed(float vx_, float vy_, float wz_) {
@@ -23,5 +23,5 @@ void Chassis::SetSpeed(float vx_, float vy_, float wz_) {
 }
 
 void Chassis::SetAngle(float angle_) {
-    ref_.angle = angle_;
+    ref_spd.angle = angle_;
 }

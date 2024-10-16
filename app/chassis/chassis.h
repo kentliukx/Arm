@@ -25,13 +25,13 @@ enum ChassisMode_e {
 class Chassis {
 protected:
     // 目标状态(机器人坐标系)
-    ChassisStatus_t ref_;
+    ChassisStatus_t ref_spd;
     // 反馈状态(机器人坐标系)
-    ChassisStatus_t fdb_;
+    ChassisStatus_t fdb_spd;
     // 目标状态(底盘坐标系)
-    ChassisStatus_t chassis_ref_;
+    ChassisStatus_t chassis_ref_spd_;
     // 反馈状态(底盘坐标系)
-    ChassisStatus_t chassis_fdb_;
+    ChassisStatus_t chassis_fdb_spd_;
 
     uint8_t chassis_lock = 0; // 0锁定底盘, 1解锁
 public:

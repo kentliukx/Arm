@@ -14,9 +14,9 @@ SwerveChassis::SwerveChassis(){
 }
 
 void SwerveChassis::ikine(void) {
-    float& vx = chassis_ref_.vx;
-    float& vy = chassis_ref_.vy;
-    float& wz = chassis_ref_.wz;
+    float& vx = chassis_ref_spd_.vx;
+    float& vy = chassis_ref_spd_.vy;
+    float& wz = chassis_ref_spd_.wz;
 
     // 将转速（rpm）换算为轮子线速度（m/s）
     float rotate_component = wz * (2.0f * PI * (wheel_base / sqrtf(2.0f))) / 60.0f;
@@ -90,8 +90,8 @@ void SwerveChassis::fkine(void) {
                         sinf(math::deg2rad(fdb_robot_.steering_angle.br))) /
                4.0f / 360.0f * (PI * 2 * wheel_radius);
 
-    chassis_fdb_.vx = vx;
-    chassis_fdb_.vy = vy;
+    chassis_fdb_spd_.vx = vx;
+    chassis_fdb_spd_.vy = vy;
 
     // 轮速 dps 转换为底盘角速度 rpm
     float wz =
@@ -105,8 +105,8 @@ void SwerveChassis::fkine(void) {
                      sinf(math::deg2rad(fdb_robot_.steering_angle.br + 135.0f))) /
             4.0f / 360.0f * wheel_radius / (wheel_base / sqrtf(2.0f)) * 60.0f;
 
-    fdb_.wz = wz;
-    chassis_fdb_.wz = wz;
+    fdb_spd.wz = wz;
+    chassis_fdb_spd_.wz = wz;
 }
 
 void SwerveChassis::handle(void) {
@@ -144,28 +144,49 @@ void SwerveChassis::handle(void) {
 }
 
 void SwerveChassis::RotateControl(void) {
+    switch (mode_) {
+        case ChassisMode_e::Separate: {
+            chassis_ref_spd_.wz = 0;
+            break;
+        }
+        case ChassisMode_e::Follow: {
+            chassis_ref_spd_.wz = follow_filter_.update(
+                    follow_control_.calc(0, feedback_robot_.gimbal_chassis_angle));
+            break;
+        }
+        case ChassisMode::TOP: {
+            // 50W: 100rpm
+            // 200W: 150rpm
+            target_chassis_.wz = (total_power - 50.0f) / 3.0f + 100.0f;
+            break;
+        }
+        case ChassisMode::ANTI_TOP:{
+            target_chassis_.wz = -(total_power - 50.0f) / 3.0f - 100.0f;
+            break;
+        }
+    }
 }
 
 void SwerveChassis::CoordinateTransformation() {
-    chassis_ref_.vx =
-            ref_.vx *
-                    cosf(math::deg2rad(fdb_.angle)) -
-            ref_.vy *
-                    sinf(math::deg2rad(fdb_.angle));
-    chassis_ref_.vy =
-            ref_.vx *
-                    sinf(math::deg2rad(fdb_.angle)) +
-            ref_.vy *
-                    cosf(math::deg2rad(fdb_.angle));
+    chassis_ref_spd_.vx =
+            ref_spd.vx *
+                    cosf(math::deg2rad(fdb_spd.angle)) -
+            ref_spd.vy *
+                    sinf(math::deg2rad(fdb_spd.angle));
+    chassis_ref_spd_.vy =
+            ref_spd.vx *
+                    sinf(math::deg2rad(fdb_spd.angle)) +
+            ref_spd.vy *
+                    cosf(math::deg2rad(fdb_spd.angle));
 
-    fdb_.vx =
-            chassis_fdb_.vx *
-                    cosf(math::deg2rad(fdb_.angle)) +
-            chassis_fdb_.vy *
-                    sinf(math::deg2rad(fdb_.angle));
-    fdb_.vy =
-            chassis_fdb_.vy *
-                    cosf(math::deg2rad(fdb_.angle)) -
-            chassis_fdb_.vx *
-                    sinf(math::deg2rad(fdb_.angle));
+    fdb_spd.vx =
+            chassis_fdb_spd_.vx *
+                    cosf(math::deg2rad(fdb_spd.angle)) +
+            chassis_fdb_spd_.vy *
+                    sinf(math::deg2rad(fdb_spd.angle));
+    fdb_spd.vy =
+            chassis_fdb_spd_.vy *
+                    cosf(math::deg2rad(fdb_spd.angle)) -
+            chassis_fdb_spd_.vx *
+                    sinf(math::deg2rad(fdb_spd.angle));
 }
