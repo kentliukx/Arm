@@ -61,7 +61,7 @@ void MecanumChassis::handle(void) {
     SetAngle(chassis_cmd_rcv_.ref_angle);
     mode_ = chassis_cmd_rcv_.mode_;
 
-    RotateControl(chassis_cmd_rcv_.fdb_angle, chassis_cmd_rcv_.follow_fdb_angle);
+    RotateControl();
     /* 电机更新反馈
      *
      */
@@ -73,10 +73,10 @@ void MecanumChassis::handle(void) {
      */
 }
 
-void MecanumChassis::RotateControl(float fdb_angle, float follow_fdb_angle) {
-    fdb_.angle = fdb_angle;
+void MecanumChassis::RotateControl() {
+    fdb_.angle = chassis_cmd_rcv_.fdb_angle;
     if (mode_ == ChassisMode_e::Follow) {
-        ref_.wz = math::deadBand(angle_pid_.calc(ref_.angle, follow_fdb_angle), -5, 5);
+        ref_.wz = math::deadBand(angle_pid_.calc(ref_.angle, chassis_cmd_rcv_.follow_fdb_angle), -5, 5);
     } else
     if (mode_ == ChassisMode_e::Gyro){
         ref_.wz = 450;

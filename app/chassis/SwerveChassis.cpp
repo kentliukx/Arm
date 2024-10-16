@@ -111,6 +111,7 @@ void SwerveChassis::fkine(void) {
 
 void SwerveChassis::handle(void) {
     // 获取控制命令
+    SubGetMessage(chassis_sub_, &chassis_cmd_rcv_);
 
     // 电机断连处理
     disconnect_handle();
@@ -130,11 +131,10 @@ void SwerveChassis::handle(void) {
     CoordinateTransformation();
 
     // 不同底盘运动模式下底盘旋转控制
-    chassis_rotate_control((float)referee.game_robot_status_.chassis_power_limit +
-                           extra_power_max);
+    RotateControl();
 
     // 逆运动学解算
-    inverse_kinematics();
+    ikine();
 
     // 逆运动学解算，通过底盘坐标系目标速度解算出每个轮子的线速度和航向电机角度
     power_limit.handle(extra_power_max);
@@ -143,7 +143,7 @@ void SwerveChassis::handle(void) {
     motor_control();
 }
 
-void SwerveChassis::RotateControl(float fdb_angle, float follow_fdb_angle) {
+void SwerveChassis::RotateControl(void) {
 }
 
 void SwerveChassis::CoordinateTransformation() {

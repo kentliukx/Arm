@@ -61,6 +61,8 @@ private:
     Publisher_t* chassis_pub_;
     // 底盘命令接收者
     Subscriber_t* chassis_sub_;
+    // 指令存放位置
+    ChassisCtrlCmd chassis_cmd_rcv_;
 
     // 构造函数
     SwerveChassis();
@@ -75,7 +77,7 @@ private:
     void handle(void) override;
 
     // 底盘旋转控制
-    void RotateControl(float fdb_angle, float follow_fdb_angle) override;
+    void RotateControl(void) override;
 
     // 坐标系转换
     void CoordinateTransformation(void);

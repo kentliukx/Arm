@@ -60,7 +60,7 @@ public:
     void handle(void) override;
 
     // 底盘旋转控制
-    void RotateControl(float fdb_angle, float follow_fdb_angle) override;
+    void RotateControl(void) override;
 
 };
 
