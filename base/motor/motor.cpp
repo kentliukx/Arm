@@ -10,7 +10,8 @@
  */
 
 #include "algorithm/math/math.h"
-#include "driver/motor/motor_driver/mit_motor_driver.h"
+#include "base/motor/motor_driver/mit_motor_driver.h"
+#include "motor.h"
 #include "string.h"
 
 namespace motor {

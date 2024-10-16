@@ -17,7 +17,7 @@
 
 #include "can.h"
 
-#include "driver/motor/motor.h"
+#include "base/motor/motor.h"
 
 namespace lk_motor {
 // read by READ_STATE command

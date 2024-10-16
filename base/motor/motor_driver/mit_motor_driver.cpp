@@ -9,7 +9,7 @@
  ******************************************************************************
  */
 
-#include "driver/motor/motor_driver/mit_motor_driver.h"
+#include "base/motor/motor_driver/mit_motor_driver.h"
 #include "algorithm/math/math.h"
 #include "string.h"
 

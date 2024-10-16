@@ -9,7 +9,7 @@
 ******************************************************************************
 */
 
-#include "driver/motor/motor_driver/lk_motor_driver.h"
+#include "base/motor/motor_driver/lk_motor_driver.h"
 #include "algorithm/math/math.h"
 
 LKMotorDriver::LKMotorDriver(Motor* motor, CAN_HandleTypeDef* hcan,

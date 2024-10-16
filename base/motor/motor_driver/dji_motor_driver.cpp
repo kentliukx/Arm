@@ -12,7 +12,7 @@
  ******************************************************************************
  */
 
-#include "driver/motor/motor_driver/dji_motor_driver.h"
+#include "base/motor/motor_driver/dji_motor_driver.h"
 #include "algorithm/math/math.h"
 
 // Configure motor id. 配置电机id
