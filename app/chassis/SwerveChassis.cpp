@@ -8,6 +8,11 @@ float vector_sum(float x_component, float y_component) {
     return sqrtf(powf(x_component, 2) + powf(y_component, 2));
 }
 
+SwerveChassis::SwerveChassis(){
+    chassis_pub_ = PubRegister("chassis_cmd", sizeof(ChassisCtrlCmd));
+    chassis_sub_ = SubRegister("chassis_fdb", sizeof(ChassisCtrlCmd));
+}
+
 void SwerveChassis::ikine(void) {
     float& vx = chassis_ref_.vx;
     float& vy = chassis_ref_.vy;
@@ -105,6 +110,37 @@ void SwerveChassis::fkine(void) {
 }
 
 void SwerveChassis::handle(void) {
+    // 获取控制命令
+
+    // 电机断连处理
+    disconnect_handle();
+
+    // 读取光电门状态，航向电机复位控制
+    if (type_ == Motor::M3508) {
+        steering_handle();
+    }
+
+    // 电机反馈值更新
+    motor_feedback_update();
+
+    // 正运动学解算，通过反馈轮速
+    fkine();
+
+    // 云台坐标系到底盘坐标系转换
+    CoordinateTransformation();
+
+    // 不同底盘运动模式下底盘旋转控制
+    chassis_rotate_control((float)referee.game_robot_status_.chassis_power_limit +
+                           extra_power_max);
+
+    // 逆运动学解算
+    inverse_kinematics();
+
+    // 逆运动学解算，通过底盘坐标系目标速度解算出每个轮子的线速度和航向电机角度
+    power_limit.handle(extra_power_max);
+
+    // 设置电机控制量
+    motor_control();
 }
 
 void SwerveChassis::RotateControl(float fdb_angle, float follow_fdb_angle) {

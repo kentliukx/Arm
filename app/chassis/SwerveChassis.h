@@ -62,6 +62,9 @@ private:
     // 底盘命令接收者
     Subscriber_t* chassis_sub_;
 
+    // 构造函数
+    SwerveChassis();
+
     // 逆运动学，底盘状态->轮速
     void ikine(void) override;
 
