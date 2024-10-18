@@ -12,6 +12,7 @@
 #include "cmath"
 #include "common/message_center/message_center.h"
 #include "common/message_center/msg_def.h"
+#include "common/power_limit/power_limit.h"
 
 #define PI 3.14159265358979f
 
@@ -85,6 +86,8 @@ class SwerveChassis : public Chassis {
 
   // 坐标系转换
   void CoordinateTransformation(void);
+
+  friend class SwerveChassisPower;
 };
 
 #endif  // RM_FRAME_SWERVECHASSIS_H
