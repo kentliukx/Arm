@@ -7,5 +7,6 @@ aux_source_directory(cap_comm src)
 aux_source_directory(referee_comm src)
 aux_source_directory(board_comm src)
 aux_source_directory(bool_input src)
+aux_source_directory(power_limit src)
 
 add_library(common STATIC ${src})
