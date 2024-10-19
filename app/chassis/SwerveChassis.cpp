@@ -8,9 +8,33 @@ float vector_sum(float x_component, float y_component) {
   return sqrtf(powf(x_component, 2) + powf(y_component, 2));
 }
 
-SwerveChassis::SwerveChassis() {
-  chassis_pub_ = PubRegister("chassis_cmd", sizeof(ChassisCtrlCmd));
-  chassis_sub_ = SubRegister("chassis_fdb", sizeof(ChassisCtrlCmd));
+SwerveChassis::SwerveChassis(Motor* CMFL, Motor* CMFR, Motor* CMBL, Motor* CMBR,
+                             Motor* STFL, Motor* STFR, Motor* STBL, Motor* STBR,
+                             LowPassFilter speed_filter, PID angle_pid)
+    : CMFL_(CMFL),
+      CMFR_(CMFR),
+      CMBL_(CMBL),
+      CMBR_(CMBR),
+      // #ifdef M3508_STEERING
+      //       STFL_(STFL, PHOTOGATE_FL_GPIO_Port, PHOTOGATE_FL_Pin,
+      //       STEERING_OFFSET.FL), STFR_(STFR, PHOTOGATE_FR_GPIO_Port,
+      //       PHOTOGATE_FR_Pin, STEERING_OFFSET.FR), STBL_(STBL,
+      //       PHOTOGATE_BL_GPIO_Port, PHOTOGATE_BL_Pin, STEERING_OFFSET.BL),
+      //       STBR_(STBR, PHOTOGATE_BR_GPIO_Port, PHOTOGATE_BR_Pin,
+      //       STEERING_OFFSET.BR), type_(Motor::M3508),
+      // #endif
+      // #ifdef GM6020_STEERING
+      STFL_(STFL, STEERING_OFFSET.FL),
+      STFR_(STFR, STEERING_OFFSET.FR),
+      STBL_(STBL, STEERING_OFFSET.BL),
+      STBR_(STBR, STEERING_OFFSET.BR),
+      type_(Motor::GM6020),
+      // #endif
+      vx_filter_(speed_filter),
+      vy_filter_(speed_filter),
+      angle_pid_(angle_pid),
+      follow_filter_(LowPassFilter(0.1f)) {
+  mode_ = Follow;
 }
 
 void SwerveChassis::ikine(void) {

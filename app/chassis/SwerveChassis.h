@@ -32,12 +32,23 @@ typedef struct SwerveStatus {
   } steering_angle;
 } SwerveStatus_t;
 
+const struct {
+  float FL = -120.0f;  // 239  284
+  float FR = 119.0f;   // 119.48  75.98
+  float BL = -136.5f;  // 224  180 223.6 179.2
+  float BR = 0.0f;     // 359.6 43.9
+} STEERING_OFFSET;
+
 class SwerveChassis : public Chassis {
  public:
   Motor *CMFL_, *CMFR_, *CMBL_, *CMBR_;
   SwerveSteering STFL_, STFR_, STBL_, STBR_;
 
   Motor::Type_e type_;
+
+  SwerveChassis(Motor* CMFL, Motor* CMFR, Motor* CMBL, Motor* CMBR, Motor* STFL,
+                Motor* STFR, Motor* STBL, Motor* STBR,
+                LowPassFilter speed_filter, PID angle_pid);
 
  private:
   float wheel_radius;  // 轮半径
