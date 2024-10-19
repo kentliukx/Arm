@@ -8,6 +8,7 @@
 #include "algorithm/math/math.h"
 #include "algorithm/pid/pid.h"
 #include "base/motor/motor.h"
+#include "base/motor/swerve_steering_motor.h"
 #include "chassis.h"
 #include "cmath"
 #include "common/message_center/message_center.h"
@@ -34,6 +35,9 @@ typedef struct SwerveStatus {
 class SwerveChassis : public Chassis {
  public:
   Motor *CMFL_, *CMFR_, *CMBL_, *CMBR_;
+  SwerveSteering STFL_, STFR_, STBL_, STBR_;
+
+  Motor::Type_e type_;
 
  private:
   float wheel_radius;  // 轮半径
@@ -53,14 +57,12 @@ class SwerveChassis : public Chassis {
   // 底盘跟随低通滤波器
   LowPassFilter follow_filter_;
 
-  //    inline bool motor_connection_check() {
-  //        return CMFL_->connect_.check() && CMFR_->connect_.check() &&
-  //               CMBL_->connect_.check() && CMBR_->connect_.check() &&
-  //               STFL_.motor_->connect_.check() &&
-  //               STFR_.motor_->connect_.check() &&
-  //               STBL_.motor_->connect_.check() &&
-  //               STBR_.motor_->connect_.check();
-  //    }
+  inline bool motor_connection_check() {
+    return CMFL_->connect_.check() && CMFR_->connect_.check() &&
+           CMBL_->connect_.check() && CMBR_->connect_.check() &&
+           STFL_.motor_->connect_.check() && STFR_.motor_->connect_.check() &&
+           STBL_.motor_->connect_.check() && STBR_.motor_->connect_.check();
+  }
 
   // 底盘反馈发布者
   Publisher_t* chassis_pub_;
