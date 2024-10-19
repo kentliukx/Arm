@@ -16,7 +16,7 @@
 
 // #include "base/monitor/can_monitor.h"
 // #include "app/client_ui.h"
-// #include "app/control.h"
+#include "app/control/control.h"
 // #include "app/imu_monitor.h"
 #include "base/monitor/motor_monitor.h"
 // #include "app/serial_tool.h"
@@ -57,16 +57,16 @@ ServoZX361D gate_servo;
 CapComm ultra_cap(&hcan2);
 
 /* FreeRTOS tasks-----------------------------------------------------------*/
-// osThreadId controlTaskHandle;
-// void controlTask(void const* argument) {
-//   rc.init();
-//   controlInit();
-//   for (;;) {
-//     rc.handle();
-//     controlLoop();
-//     osDelay(1);
-//   }
-// }
+osThreadId controlTaskHandle;
+void controlTask(void const* argument) {
+  rc.init();
+  controlInit();
+  for (;;) {
+    rc.handle();
+    controlLoop();
+    osDelay(1);
+  }
+}
 
 osThreadId motorTaskHandle;
 void motorTask(void const* argument) {
@@ -125,8 +125,8 @@ void motorTask(void const* argument) {
 
 // Create and config tasks
 void rtosTaskInit(void) {
-  //  osThreadDef(control_task, controlTask, osPriorityAboveNormal, 0, 256);
-  //  controlTaskHandle = osThreadCreate(osThread(control_task), NULL);
+  osThreadDef(control_task, controlTask, osPriorityAboveNormal, 0, 256);
+  controlTaskHandle = osThreadCreate(osThread(control_task), NULL);
 
   osThreadDef(motor_task, motorTask, osPriorityHigh, 0, 128);
   motorTaskHandle = osThreadCreate(osThread(motor_task), NULL);
