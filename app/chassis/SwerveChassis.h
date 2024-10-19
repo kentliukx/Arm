@@ -81,9 +81,6 @@ class SwerveChassis : public Chassis {
   // 底盘相关处理
   void handle(void) override;
 
-  // 底盘旋转控制
-  void RotateControl(void) override;
-
   // 坐标系转换
   void CoordinateTransformation(void);
 

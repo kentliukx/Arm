@@ -66,7 +66,6 @@ void MecanumChassis::handle(void) {
     mode_ = chassis_cmd_rcv_.mode_;
   }
 
-  RotateControl();
   /* 电机更新反馈
    *
    */
@@ -76,21 +75,4 @@ void MecanumChassis::handle(void) {
   /* 给出电机控制值
    *
    */
-}
-
-void MecanumChassis::RotateControl() {
-  fdb_spd.angle = chassis_cmd_rcv_.fdb_angle;
-  if (mode_ == ChassisMode_e::Follow) {
-    ref_spd.wz = math::deadBand(
-        angle_pid_.calc(ref_spd.angle, chassis_cmd_rcv_.follow_fdb_angle), -5,
-        5);
-  } else if (mode_ == ChassisMode_e::Gyro) {
-    ref_spd.wz = 450;
-  } else if (mode_ == ChassisMode_e::GyroChange) {
-    float dice = sinf(HAL_GetTick() / 100.f);
-    ref_spd.wz = 450;
-    if (dice >= 0) ref_spd.wz = 250;
-  } else if (mode_ == ChassisMode_e::Twist) {
-    ref_spd.wz = 480 * sin(HAL_GetTick() * 6e-3f);
-  }
 }

@@ -130,9 +130,6 @@ void SwerveChassis::handle(void) {
   // 云台坐标系到底盘坐标系转换
   CoordinateTransformation();
 
-  // 不同底盘运动模式下底盘旋转控制
-  RotateControl();
-
   // 逆运动学解算
   ikine();
 
@@ -143,35 +140,6 @@ void SwerveChassis::handle(void) {
   motor_control();
 }
 
-void SwerveChassis::RotateControl(void) {
-  fdb_spd.angle = chassis_cmd_rcv_.fdb_angle;
-  float total_power =
-      chassis_cmd_rcv_.chassis_power_limit + chassis_cmd_rcv_.extra_power_max;
-  switch (mode_) {
-    case ChassisMode_e::Separate: {
-      chassis_ref_spd_.wz = 0;
-      break;
-    }
-    case ChassisMode_e::Follow: {
-      chassis_ref_spd_.wz = math::deadBand(
-          angle_pid_.calc(ref_spd.angle, chassis_cmd_rcv_.follow_fdb_angle), -5,
-          5);
-      ;
-      break;
-    }
-    case ChassisMode_e::Gyro: {
-      // 50W: 100rpm
-      // 200W: 150rpm
-      chassis_ref_spd_.wz = (total_power - 50.0f) / 3.0f + 100.0f;
-      break;
-    }
-    case ChassisMode_e::RevGyro: {
-      chassis_ref_spd_.wz = -(total_power - 50.0f) / 3.0f - 100.0f;
-      break;
-    }
-  }
-}
-
 void SwerveChassis::CoordinateTransformation() {
   chassis_ref_spd_.vx = ref_spd.vx * cosf(math::deg2rad(fdb_spd.angle)) -
                         ref_spd.vy * sinf(math::deg2rad(fdb_spd.angle));
@@ -180,8 +148,6 @@ void SwerveChassis::CoordinateTransformation() {
 
   fdb_spd.vx = chassis_fdb_spd_.vx * cosf(math::deg2rad(fdb_spd.angle)) +
                chassis_fdb_spd_.vy * sinf(math::deg2rad(fdb_spd.angle));
-  fdb_spd.vy = chassis_fdb_spd_.vy *
-                    cosf(math::deg2rad(fdb_spd.angle)) -
-            chassis_fdb_spd_.vx *
-                    sinf(math::deg2rad(fdb_spd.angle));
+  fdb_spd.vy = chassis_fdb_spd_.vy * cosf(math::deg2rad(fdb_spd.angle)) -
+               chassis_fdb_spd_.vx * sinf(math::deg2rad(fdb_spd.angle));
 }

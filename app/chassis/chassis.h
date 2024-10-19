@@ -15,12 +15,9 @@ typedef struct ChassisStatus {
 } ChassisStatus_t;
 
 enum ChassisMode_e {
-  Separate,    // 云台底盘分离
-  Follow,      // 底盘跟随云台
-  Gyro,        // 陀螺
-  Twist,       // 扭腰
-  GyroChange,  // 变速陀螺
-  RevGyro,     // 反向自转
+  Separate,  // 云台底盘分离
+  Follow,    // 底盘跟随云台
+  Lock,      // 锁定底盘
 };
 
 class Chassis {
@@ -47,18 +44,14 @@ class Chassis {
   // 底盘相关处理
   virtual void handle(void);
 
-  // 底盘旋转控制
-  virtual void RotateControl(void);
-
  protected:
   // 设置速度
   void SetVx(float vx_);
   void SetVy(float vy_);
   void SetWz(float wz_);
-    void SetAngle(float angle_);
+  void SetAngle(float angle_);
 
-    void SetSpeed(float vx_, float vy_, float wz_);
-
+  void SetSpeed(float vx_, float vy_, float wz_);
 };
 
-#endif//CHASSIS25_CHASSIS_H
+#endif  // CHASSIS25_CHASSIS_H
