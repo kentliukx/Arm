@@ -10,3 +10,56 @@
 */
 
 #include "control.h"
+
+#include "base/monitor/motor_monitor.h"
+#include "base/remote/remote.h"
+#include "iwdg.h"
+
+extern RC rc;
+
+void iwdgHandler(bool iwdg_refresh_flag);
+void robotPowerStateFSM(bool stop_flag);
+void robotReset(void);
+bool robotStartup(void);
+void robotControl(void);
+
+// 上电状态
+enum RobotPowerState_e {
+  STOP = 0,
+  STARTUP = 1,
+  WORKING = 2,
+} robot_state;
+
+// 初始化标志
+bool startup_flag = false;
+// 遥控器挡位记录
+RC::RCSwitch last_rc_switch;
+RC::RCChannel last_rc_channel;
+
+void controlInit(void) { robot_state = STOP; }
+
+// 控制主循环
+void controlLoop(void) {
+  iwdgHandler(rc.connect_.check());
+  robotPowerStateFSM(!rc.connect_.check() || rc.switch_.r == RC::DOWN);
+
+  if (robot_state == STOP) {
+    allMotorsStopShutoff();
+    robotReset();
+  } else if (robot_state == STARTUP) {
+    allMotorsOn();                  // 电机上电
+    startup_flag = robotStartup();  // 开机状态判断
+    robot_state = WORKING;
+  } else if (robot_state == WORKING) {
+    allMotorsOn();   // 电机上电
+    robotControl();  // 机器人控制
+  }
+
+  //  chassis.handle();
+  //  gimbal.handle();
+  //  boardLedHandle();
+
+  // 记录遥控器挡位状态
+  last_rc_switch = rc.switch_;
+  last_rc_channel = rc.channel_;
+}

@@ -12,6 +12,8 @@
 #ifndef RM_FRAME_CONTROL_H
 #define RM_FRAME_CONTROL_H
 
+#include "base/remote/remote.h"
+
 // 控制初始化
 void controlInit(void);
 // 控制主循环
