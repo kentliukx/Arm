@@ -39,7 +39,7 @@ RC rc;
 // #endif  // CV_UART
 #ifdef REFEREE_UART
 RefereeComm referee(REFEREE_UART);
-UI ui(REFEREE_UART, &referee, ui_func, sizeof(ui_func) / sizeof(void*));
+// UI ui(REFEREE_UART, &referee, ui_func, sizeof(ui_func) / sizeof(void*));
 #else
 RefereeComm referee;
 #endif  // REFEREE_UART
@@ -103,16 +103,16 @@ void motorTask(void const* argument) {
 //   }
 // }
 
-osThreadId refereeCommTaskHandle;
-void refereeCommTask(void const* argument) {
-  referee.init();
-  ui.init();
-  for (;;) {
-    referee.handle();
-    ui.handle();
-    osDelay(1);
-  }
-}
+// osThreadId refereeCommTaskHandle;
+// void refereeCommTask(void const* argument) {
+//   referee.init();
+//   ui.init();
+//   for (;;) {
+//     referee.handle();
+//     ui.handle();
+//     osDelay(1);
+//   }
+// }
 
 // osThreadId serialToolTaskHandle;
 // void serialToolTask(void const* argument) {
@@ -140,8 +140,8 @@ void rtosTaskInit(void) {
   //  osThreadDef(minipc_comm_task, minipcCommTask, osPriorityNormal, 0, 512);
   //  minipcCommTaskHandle = osThreadCreate(osThread(minipc_comm_task), NULL);
 
-  osThreadDef(referee_comm_task, refereeCommTask, osPriorityNormal, 0, 512);
-  refereeCommTaskHandle = osThreadCreate(osThread(referee_comm_task), NULL);
+  //  osThreadDef(referee_comm_task, refereeCommTask, osPriorityNormal, 0, 512);
+  //  refereeCommTaskHandle = osThreadCreate(osThread(referee_comm_task), NULL);
 
   //  osThreadDef(serial_tool_task, serialToolTask, osPriorityLow, 0, 1024);
   //  serialToolTaskHandle = osThreadCreate(osThread(serial_tool_task), NULL);
