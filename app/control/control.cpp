@@ -38,7 +38,7 @@ enum RobotPowerState_e {
 } robot_state;
 
 // 更多的底盘状态(用于UI等)
-enum ChassisState_e {
+enum ChassisStateExt_e {
   LOCK,
   FOLLOW,
   SEPARATE,
@@ -46,6 +46,23 @@ enum ChassisState_e {
   GYRO,
   GYROCHANGE,
 } chassis_state;
+
+// 底盘旋转方向
+float chassis_gyro_dir = 1;
+
+// 遥控器相关参数
+namespace rcctrl {
+float arm_position_rate = 2e-4f;
+float arm_direction_rate = 3e-6f;
+float arm_joint_rate = 1.5e-6f;
+
+float chassis_speed_rate = 3.6e-3f;
+float chassis_rotate_rate = 0.72f;
+float chassis_follow_ff_rate = 0.3f;
+float chassis_rand_gyro_rate = 20.f;
+
+float gimbal_rate = 2e-4f;
+}  // namespace rcctrl
 
 // 初始化标志
 bool startup_flag = false;
@@ -55,8 +72,8 @@ RC::RCChannel last_rc_channel;
 
 void controlInit(void) {
   robot_state = STOP;
-  chassis_ctrl_ref_.mode_ = Lock;
-  chassis_state = LOCK;
+  chassis_ctrl_ref_.mode_ = ChassisMode_e::Lock;
+  chassis_state = ChassisStateExt_e::LOCK;
 }
 
 // 控制主循环
@@ -111,11 +128,16 @@ void robotPowerStateFSM(bool stop_flag) {
 }
 
 // 重置各功能状态
-void robotReset(void) { startup_flag = false; }
+void robotReset(void) {
+  startup_flag = false;
+  chassis_state = ChassisStateExt_e::FOLLOW;
+  chassis_ctrl_ref_.mode_ = ChassisMode_e::Follow;
+}
 
 // 开机上电启动处理
 bool robotStartup(void) {
   bool flag = true;
+  chassis_ctrl_ref_.mode_ = ChassisMode_e::Follow;
   //  if (!gimbal.init_.j0_finish) {
   //    chassis.lock_ = true;
   //    flag = false;
@@ -144,5 +166,38 @@ void robotCmdSend(void) {
 void robotControl(void) {
   if (rc.switch_.l == RC::UP && rc.switch_.r == RC::MID) {
     // 云台底盘测试
+    if (rc.channel_.dial_wheel < -100) {
+      // 开陀螺
+      if (rc.channel_.r_col > 300) {
+        chassis_state = ChassisStateExt_e::TWIST;
+        chassis_ctrl_ref_.mode_ = ChassisMode_e::Separate;
+      } else {
+        chassis_state = ChassisStateExt_e::GYRO;
+        chassis_ctrl_ref_.mode_ = ChassisMode_e::Separate;
+      }
+    } else if (rc.channel_.dial_wheel > 100) {
+      // 关陀螺
+      chassis_state = ChassisStateExt_e::FOLLOW;
+      chassis_ctrl_ref_.mode_ = ChassisMode_e::Follow;
+    } else {
+    }
+
+    if (chassis_state == ChassisStateExt_e::FOLLOW) {
+      chassis_ctrl_ref_.vx = rc.channel_.r_col * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.vy = -rc.channel_.r_row * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.wz = 0;
+    } else if (chassis_state == ChassisStateExt_e::GYRO) {
+      float dice = sinf(HAL_GetTick() / 100.f);
+      float wz = 450;
+      if (dice >= 0) wz = 250;
+      chassis_ctrl_ref_.vx = rc.channel_.r_col * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.vy = -rc.channel_.r_row * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.wz = wz * chassis_gyro_dir;
+    } else if (chassis_state == ChassisStateExt_e::TWIST) {
+      float wz = 480 * sin(HAL_GetTick() * 6e-3f);
+      chassis_ctrl_ref_.vx = rc.channel_.r_col * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.vy = -rc.channel_.r_row * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.wz = wz;
+    }
   }
 }
