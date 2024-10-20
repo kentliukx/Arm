@@ -11,6 +11,11 @@
 
 #include "control.h"
 
+#include "base/monitor/motor_monitor.h"
+#include "base/motor/motor.h"
+
+extern Motor CMFL;
+
 // 全局变量声明
 extern RC rc;
 
@@ -165,6 +170,8 @@ void robotCmdSend(void) {
 
 void robotControl(void) {
   if (rc.switch_.l == RC::UP && rc.switch_.r == RC::MID) {
+    CMFL.setSpeed(50);
+
     // 云台底盘测试
     if (rc.channel_.dial_wheel < -100) {
       // 开陀螺
