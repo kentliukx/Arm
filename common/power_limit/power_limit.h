@@ -8,7 +8,7 @@
 * All rights reserved.
 ******************************************************************************
 */
-
+/*
 #ifndef POWER_LIMIT_H
 #define POWER_LIMIT_H
 
@@ -90,34 +90,35 @@ class SwerveChassisPower : public Power {
   void solve(const float& p_ref) override;
 };
 
-class WheelLeggedChassisPower : Power {
- public:
-  WheelLeggedChassis* chassis_;
-
-  // reference_power_limit = referee_limit + cap + buffer
-  float cap_volt_;             // capacity voltage
-  float referee_power_limit_;  // power limit read from referee
-  float referee_buffer_;       // buffer read from referee
-  float extra_power_limit_;    // capacity power
-  float ref_power_limit_;      // total reference power
-
-  // power feedback (estimated)
-  float motor_power_fdb_l_;  // left wheel motor feedback
-  float motor_power_fdb_r_;  // right wheel motor feedback
-  float chassis_power_fdb_;  // total feedback
-
-  const float static_power_ = 13;
-
-  float velocity_max_;
-  float yaw_velocity_max_;
-
-  LowPassFilter chassis_power_fdb_filter_;  // filter of feedback power
-
- public:
-  float ref_power_limit() const { return ref_power_limit_; }
-  float power_fdb() const { return chassis_power_fdb_; }
-  float velocity_max() const { return velocity_max_; }
-  float yaw_velocity_max() const { return yaw_velocity_max_; }
-};
+// class WheelLeggedChassisPower : Power {
+//  public:
+//   WheelLeggedChassis* chassis_;
+//
+//   // reference_power_limit = referee_limit + cap + buffer
+//   float cap_volt_;             // capacity voltage
+//   float referee_power_limit_;  // power limit read from referee
+//   float referee_buffer_;       // buffer read from referee
+//   float extra_power_limit_;    // capacity power
+//   float ref_power_limit_;      // total reference power
+//
+//   // power feedback (estimated)
+//   float motor_power_fdb_l_;  // left wheel motor feedback
+//   float motor_power_fdb_r_;  // right wheel motor feedback
+//   float chassis_power_fdb_;  // total feedback
+//
+//   const float static_power_ = 13;
+//
+//   float velocity_max_;
+//   float yaw_velocity_max_;
+//
+//   LowPassFilter chassis_power_fdb_filter_;  // filter of feedback power
+//
+//  public:
+//   float ref_power_limit() const { return ref_power_limit_; }
+//   float power_fdb() const { return chassis_power_fdb_; }
+//   float velocity_max() const { return velocity_max_; }
+//   float yaw_velocity_max() const { return yaw_velocity_max_; }
+// };
 
 #endif  // POWER_LIMIT_H
+ */
