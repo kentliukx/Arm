@@ -11,11 +11,11 @@
 #ifndef CAP_COMM_H
 #define CAP_COMM_H
 
-#include "common/connect/connect.h"
 #include "can.h"
+#include "common/connect/connect.h"
 
 class CapComm {
-public:
+ public:
   CapComm(CAN_HandleTypeDef* hcan);
 
   void handle(void);
@@ -32,9 +32,9 @@ public:
   // HAL_CAN_RxFifo0MsgPendingCallback()
   // 电容信息接收回调，在HAL_CAN_RxFifo0MsgPendingCallback中调用
   void canRxMsgCallback(CAN_HandleTypeDef* hcan, CAN_RxHeaderTypeDef rx_header,
-                       uint8_t rx_data[8]);
+                        uint8_t rx_data[8]);
 
-public:
+ public:
   Connect connect_;
 
   // board to capacity
@@ -50,7 +50,7 @@ public:
     float chassis_power;
   } rx_msg_;
 
-private:
+ private:
   CAN_HandleTypeDef* hcan_;
   CAN_TxHeaderTypeDef can_tx_header_;
   uint8_t can_tx_data_[8];
