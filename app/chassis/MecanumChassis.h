@@ -36,6 +36,8 @@ class MecanumChassis : public Chassis {
   Subscriber_t* chassis_sub_;
   // 底盘接收数据指针
   ChassisCtrlCmd chassis_cmd_rcv_;
+  // 底盘反馈数据指针
+  ChassisCtrlCmd chassis_cmd_tsm_;
 
   float x_bias;            // x方向偏移 (底盘前方为正方向) (m)
   float y_bias;            // y方向偏移 (底盘左方为正方向) (m)

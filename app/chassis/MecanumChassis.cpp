@@ -66,15 +66,17 @@ void MecanumChassis::handle(void) {
     mode_ = chassis_cmd_rcv_.mode_;
   }
 
+  // 获取轮电机反馈
   wheel_fdb_.fl = cmfl_->realSpeed();
   wheel_fdb_.fr = cmfr_->realSpeed();
   wheel_fdb_.bl = cmbl_->realSpeed();
   wheel_fdb_.br = cmbr_->realSpeed();
-
+  // 正运动学解算当前底盘反馈状态
   fkine();
-
+  // 逆运动学解算目标轮速
   ikine();
 
+  // 控制电机速度
   if (mode_ != Lock) {
     cmfl_->setSpeed(wheel_ref_.fl);
     cmfr_->setSpeed(wheel_ref_.fr);
@@ -86,4 +88,11 @@ void MecanumChassis::handle(void) {
     cmbl_->setSpeed(0);
     cmbr_->setSpeed(0);
   }
+
+  // 编写反馈数据包
+  chassis_cmd_tsm_.mode_ = mode_;
+  chassis_cmd_tsm_.vx = fdb_spd.vx;
+  chassis_cmd_tsm_.vy = fdb_spd.vy;
+  chassis_cmd_tsm_.wz = fdb_spd.wz;
+  PubPushMessage(chassis_pub_, &chassis_cmd_tsm_);
 }
