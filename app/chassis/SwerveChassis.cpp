@@ -138,15 +138,15 @@ void SwerveChassis::handle(void) {
   SubGetMessage(chassis_sub_, &chassis_cmd_rcv_);
 
   // 电机断连处理
-  disconnect_handle();
+  //  disconnect_handle();
 
   // 读取光电门状态，航向电机复位控制
   if (type_ == Motor::M3508) {
-    steering_handle();
+    //    steering_handle();
   }
 
   // 电机反馈值更新
-  motor_feedback_update();
+  //  motor_feedback_update();
 
   // 正运动学解算，通过反馈轮速
   fkine();
@@ -158,10 +158,10 @@ void SwerveChassis::handle(void) {
   ikine();
 
   // 逆运动学解算，通过底盘坐标系目标速度解算出每个轮子的线速度和航向电机角度
-  power_limit.handle(extra_power_max);
+  //  power_limit.handle(extra_power_max);
 
   // 设置电机控制量
-  motor_control();
+  //  motor_control();
 }
 
 void SwerveChassis::CoordinateTransformation() {
