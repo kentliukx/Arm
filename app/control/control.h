@@ -12,7 +12,10 @@
 #ifndef RM_FRAME_CONTROL_H
 #define RM_FRAME_CONTROL_H
 
+#include "base/monitor/motor_monitor.h"
 #include "base/remote/remote.h"
+#include "common/message_center/msg_def.h"
+#include "iwdg.h"
 
 // 控制初始化
 void controlInit(void);

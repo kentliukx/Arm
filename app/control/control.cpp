@@ -11,17 +11,18 @@
 
 #include "control.h"
 
-#include "base/monitor/motor_monitor.h"
-#include "base/remote/remote.h"
-#include "iwdg.h"
-
+// 全局变量声明
 extern RC rc;
 
+// msg接收、发送mailbox
+
+// 函数声明
 void iwdgHandler(bool iwdg_refresh_flag);
 void robotPowerStateFSM(bool stop_flag);
 void robotReset(void);
 bool robotStartup(void);
 void robotControl(void);
+void robotCmdSend(void);
 
 // 上电状态
 enum RobotPowerState_e {
@@ -91,3 +92,23 @@ void robotPowerStateFSM(bool stop_flag) {
 
 // 重置各功能状态
 void robotReset(void) { startup_flag = false; }
+
+// 开机上电启动处理
+bool robotStartup(void) {
+  bool flag = true;
+  //  if (!gimbal.init_.j0_finish) {
+  //    chassis.lock_ = true;
+  //    flag = false;
+  //  } else {
+  //    chassis.lock_ = false;
+  //  }
+  //  if (!gimbal.init_.pitch_finish) {
+  //    flag = false;
+  //  }
+  if (HAL_GetTick() < 1000) {
+    flag = false;
+  }
+  return flag;
+}
+
+void robotCmdSend(void) {}
