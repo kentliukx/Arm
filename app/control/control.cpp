@@ -37,13 +37,27 @@ enum RobotPowerState_e {
   WORKING = 2,
 } robot_state;
 
+// 更多的底盘状态(用于UI等)
+enum ChassisState_e {
+  LOCK,
+  FOLLOW,
+  SEPARATE,
+  TWIST,
+  GYRO,
+  GYROCHANGE,
+} chassis_state;
+
 // 初始化标志
 bool startup_flag = false;
 // 遥控器挡位记录
 RC::RCSwitch last_rc_switch;
 RC::RCChannel last_rc_channel;
 
-void controlInit(void) { robot_state = STOP; }
+void controlInit(void) {
+  robot_state = STOP;
+  chassis_ctrl_ref_.mode_ = Lock;
+  chassis_state = LOCK;
+}
 
 // 控制主循环
 void controlLoop(void) {
@@ -125,4 +139,10 @@ void robotCmdInit(void) {
 void robotCmdSend(void) {
   SubGetMessage(chassis_fdb_sub_, &chassis_ctrl_fdb_);
   PubPushMessage(chassis_cmd_pub_, &chassis_ctrl_ref_);
+}
+
+void robotControl(void) {
+  if (rc.switch_.l == RC::UP && rc.switch_.r == RC::MID) {
+    // 云台底盘测试
+  }
 }
