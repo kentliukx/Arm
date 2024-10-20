@@ -66,13 +66,24 @@ void MecanumChassis::handle(void) {
     mode_ = chassis_cmd_rcv_.mode_;
   }
 
-  /* 电机更新反馈
-   *
-   */
+  wheel_fdb_.fl = cmfl_->realSpeed();
+  wheel_fdb_.fr = cmfr_->realSpeed();
+  wheel_fdb_.bl = cmbl_->realSpeed();
+  wheel_fdb_.br = cmbr_->realSpeed();
+
   fkine();
 
   ikine();
-  /* 给出电机控制值
-   *
-   */
+
+  if (mode_ != Lock) {
+    cmfl_->setSpeed(wheel_ref_.fl);
+    cmfr_->setSpeed(wheel_ref_.fr);
+    cmbl_->setSpeed(wheel_ref_.bl);
+    cmbr_->setSpeed(wheel_ref_.br);
+  } else {
+    cmfl_->setSpeed(0);
+    cmfr_->setSpeed(0);
+    cmbl_->setSpeed(0);
+    cmbr_->setSpeed(0);
+  }
 }

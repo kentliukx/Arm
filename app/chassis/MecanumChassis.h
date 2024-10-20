@@ -7,6 +7,7 @@
 
 #include "algorithm/math/math.h"
 #include "algorithm/pid/pid.h"
+#include "base/motor/motor.h"
 #include "chassis.h"
 #include "cmath"
 #include "common/log/bsp_log.h"
@@ -46,6 +47,8 @@ class MecanumChassis : public Chassis {
   MecanumChassis();
   // 底盘角速度前馈
   float feedforward_wz;
+  // 电机指针
+  Motor *cmfl_, *cmfr_, *cmbl_, *cmbr_;
 
   // 目标速度滤波(逐渐加速)
   LowPassFilter vx_filter_;
