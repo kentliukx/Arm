@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
-* @file    motor_monitor.cpp/h
-* @brief   Motor parameter, id config and management. 电机参数id配置和统一管理
+* @file    control.cpp/h
+* @brief   全车主要控制逻辑，以及主控数据收发点
 * @author  Likai Fu
 ******************************************************************************
 * Copyright (c) 2025 Team JiaoLong-SJTU
@@ -14,6 +14,7 @@
 
 #include "base/monitor/motor_monitor.h"
 #include "base/remote/remote.h"
+#include "common/message_center/message_center.h"
 #include "common/message_center/msg_def.h"
 #include "iwdg.h"
 
@@ -21,5 +22,9 @@
 void controlInit(void);
 // 控制主循环
 void controlLoop(void);
+// 初始化主控cmd模块
+void robotCmdInit(void);
+// 主控发送指令
+void robotCmdSend(void);
 
 #endif  // RM_FRAME_CONTROL_H

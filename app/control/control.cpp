@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
-* @file    motor_monitor.cpp/h
-* @brief   Motor parameter, id config and management. 电机参数id配置和统一管理
+* @file    control.cpp/h
+* @brief   全车主要控制逻辑，以及主控数据收发点
 * @author  Likai Fu
 ******************************************************************************
 * Copyright (c) 2025 Team JiaoLong-SJTU
@@ -15,6 +15,11 @@
 extern RC rc;
 
 // msg接收、发送mailbox
+ChassisCtrlCmd chassis_ctrl_ref_, chassis_ctrl_fdb_;
+
+// msg的订阅者与发布者
+Subscriber_t* chassis_fdb_sub_;
+Publisher_t* chassis_cmd_pub_;
 
 // 函数声明
 void iwdgHandler(bool iwdg_refresh_flag);
@@ -23,6 +28,7 @@ void robotReset(void);
 bool robotStartup(void);
 void robotControl(void);
 void robotCmdSend(void);
+void robotCmdInit(void);
 
 // 上电状态
 enum RobotPowerState_e {
@@ -111,4 +117,12 @@ bool robotStartup(void) {
   return flag;
 }
 
-void robotCmdSend(void) {}
+void robotCmdInit(void) {
+  chassis_cmd_pub_ = PubRegister("chassis_cmd", sizeof(ChassisCtrlCmd));
+  chassis_fdb_sub_ = SubRegister("chassis_fdb", sizeof(ChassisCtrlCmd));
+}
+
+void robotCmdSend(void) {
+  SubGetMessage(chassis_fdb_sub_, &chassis_ctrl_fdb_);
+  PubPushMessage(chassis_cmd_pub_, &chassis_ctrl_ref_);
+}

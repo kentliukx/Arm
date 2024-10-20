@@ -70,7 +70,9 @@ void controlTask(void const* argument) {
 
 osThreadId appTaskHandle;
 void appTask(void const* argument) {
+  robotCmdInit();
   for (;;) {
+    robotCmdSend();
     // chassis.handle();
     // gimbal.handle();
     // shooter.handle();
