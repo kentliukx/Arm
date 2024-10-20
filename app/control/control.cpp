@@ -63,3 +63,35 @@ void controlLoop(void) {
   last_rc_switch = rc.switch_;
   last_rc_channel = rc.channel_;
 }
+
+// IWDG处理，true持续刷新，false进入STOP状态并停止刷新
+void iwdgHandler(bool iwdg_refresh_flag) {
+  if (!iwdg_refresh_flag) {
+    robot_state = STOP;
+  } else {
+    HAL_IWDG_Refresh(&hiwdg);
+  }
+}
+
+// STOP(断电，安全模式)/开机/正常运行 状态机
+void robotPowerStateFSM(bool stop_flag) {
+  if (robot_state == STOP) {
+    if (!stop_flag) {
+      robot_state = STARTUP;
+    }
+  } else if (robot_state == STARTUP) {
+    if (stop_flag) {
+      robot_state = STOP;
+    } else if (startup_flag) {
+      // 初始化/复位完成
+      robot_state = WORKING;
+    }
+  } else if (robot_state == WORKING) {
+    if (stop_flag) {
+      robot_state = STOP;
+    }
+  }
+}
+
+// 重置各功能状态
+void robotReset(void) { startup_flag = false; }
