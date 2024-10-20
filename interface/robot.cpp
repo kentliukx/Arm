@@ -64,7 +64,7 @@ void controlTask(void const* argument) {
   for (;;) {
     rc.handle();
     controlLoop();
-    osDelay(1);
+    osDelay(5);
   }
 }
 
