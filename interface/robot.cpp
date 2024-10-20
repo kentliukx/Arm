@@ -68,6 +68,16 @@ void controlTask(void const* argument) {
   }
 }
 
+osThreadId appTaskHandle;
+void appTask(void const* argument) {
+  for (;;) {
+    // chassis.handle();
+    // gimbal.handle();
+    // shooter.handle();
+    osDelay(1);
+  }
+}
+
 osThreadId motorTaskHandle;
 void motorTask(void const* argument) {
   allMotorsInit();
@@ -130,6 +140,8 @@ void rtosTaskInit(void) {
 
   osThreadDef(motor_task, motorTask, osPriorityHigh, 0, 128);
   motorTaskHandle = osThreadCreate(osThread(motor_task), NULL);
+
+  osThreadDef(app_task, appTask, osPriorityHigh, 0, 128);
 
   //  osThreadDef(can_task, canTask, osPriorityHigh, 0, 128);
   //  canTaskHandle = osThreadCreate(osThread(can_task), NULL);

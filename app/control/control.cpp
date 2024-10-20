@@ -55,10 +55,6 @@ void controlLoop(void) {
     robotControl();  // 机器人控制
   }
 
-  //  chassis.handle();
-  //  gimbal.handle();
-  //  boardLedHandle();
-
   // 记录遥控器挡位状态
   last_rc_switch = rc.switch_;
   last_rc_channel = rc.channel_;
