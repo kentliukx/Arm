@@ -24,6 +24,8 @@
 #include "algorithm/crc/crc.h"
 #include "common/connect/connect.h"
 #include "common/fifo/fifo_buffer.h"
+#include "common/message_center/message_center.h"
+#include "common/message_center/msg_def.h"
 #include "cv_protocol.h"
 #include "usart.h"
 
@@ -45,6 +47,7 @@ class CVComm {
   template <typename T>
   void txMsg(cvcomm::MsgStream_e msg_stream, cvcomm::MsgType_e msg_type,
              const T& msg);
+  void txHandle(uint32_t* tic);
   // Data receive callback 接收中断
   void rxCallback(void);
   // UART端口校验
@@ -82,6 +85,13 @@ class CVComm {
 
  private:
   UART_HandleTypeDef* huart_;
+  CVMode mode_;
+
+  Subscriber_t* gimbal_upload_sub_;
+  Subscriber_t* shoot_upload_sub_;
+  Subscriber_t* referee_cv_sub_;
+  Publisher_t* gimbal_cmd_pub_;
+  Publisher_t* shoot_cmd_pub_;
 
   struct Tx_t {
     uint8_t buf[CV_COMM_TX_BUF_SIZE];

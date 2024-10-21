@@ -18,11 +18,20 @@ typedef struct {
   ChassisMode_e mode_;                         // 底盘模式
 } ChassisCtrlCmd;
 
+// 裁判系统->视觉通信数据
+typedef struct {
+  uint8_t robot_id;
+  float game_robot_pos_x;
+  float game_robot_pos_y;
+} RefereeCVData;
+
+// 云台->视觉通信数据
 typedef struct {
   float yaw_offset;    // 电控yaw补偿
   float pitch_offset;  // 电控pitch补偿
 } GimbalUploadData;
 
+// 视觉->云台通信数据
 typedef struct {
   float yaw_angle;    // deg
   float pitch_angle;  // deg
@@ -31,6 +40,7 @@ typedef struct {
   float dist;         // m，视觉测量距离
 } GimbalCtrlCmd;
 
+// 视觉->发射通信数据
 typedef struct {
   uint8_t shoot_flag;  // 发射标志
   uint32_t shoot_id;   // 发射id
