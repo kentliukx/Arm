@@ -11,7 +11,7 @@ static Publisher_t message_center = {.topic_name = "Message_Manager",
                                      .next_topic_node = NULL};
 
 static void CheckName(char* name) {
-  if (strnlen(name, MAX_TOPIC_NAME_LEN + 1) >= MAX_TOPIC_NAME_LEN) {
+  if (strlen(name) >= MAX_TOPIC_NAME_LEN) {
     //        LOGERROR("EVENT NAME TOO LONG:%s", name);
     while (1)
       ;  // 进入这里说明话题名超出长度限制
