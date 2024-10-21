@@ -40,11 +40,11 @@ class CVComm {
   void init(void);
   // Handle mode, check connection 处理通信模式，检查连接状态
   void handle(void);
-  // Data transmit monitor 数据发送管理
-  void txMonitor(uint32_t* tick);
 
   // Data transmit 数据发送
-  void txMsg(cvcomm::MsgStream_e msg_stream, cvcomm::MsgType_e msg_type);
+  template <typename T>
+  void txMsg(cvcomm::MsgStream_e msg_stream, cvcomm::MsgType_e msg_type,
+             const T& msg);
   // Data receive callback 接收中断
   void rxCallback(void);
   // UART端口校验
@@ -64,8 +64,6 @@ class CVComm {
   }
 
  public:
-  CVMode mode_;
-
   Connect general_connect_;
   cvcomm::general::PC2Board_t general_pc2board_msg_;
   cvcomm::general::Board2PC_t general_board2pc_msg_;

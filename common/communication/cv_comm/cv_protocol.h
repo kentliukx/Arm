@@ -151,6 +151,8 @@ typedef struct Board2PC {
   uint8_t is_big_energy;  // 0-小符，1-大符
   //  float chassis_vx;  // m/s，底盘前后速度，前+后-，用于预测和发射判断
   //  float chassis_vy;  // m/s，底盘左右速度，左+右-，用于预测和发射判断
+  float pos_x;  // UWB / 选手端小地图点击位置（反符用）
+  float pos_y;
 } __packed Board2PC_t;
 }  // namespace aimshoot
 
