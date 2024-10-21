@@ -53,7 +53,7 @@ void canTxMonitor(void) {
   //  lk_motor_driver.canTxMsg(1);
 
   if (HAL_GetTick() % 2 == 0) {
-    // dji_motor_driver.canTxMsg(1, djimotor::ID_1_4);
+    dji_motor_driver.canTxMsg(1, djimotor::ID_1_4);
   }
 
   // CAN2
