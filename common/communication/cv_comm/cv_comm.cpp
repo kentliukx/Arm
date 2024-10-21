@@ -43,49 +43,12 @@ void CVComm::handle(void) {
   aim_shoot_connect_.check();
   navigation_connect_.check();
   game_status_connect_.check();
-
-  general_board2pc_msg_.mode = (uint8_t)mode_;
-}
-
-// Data transmit monitor 数据发送管理
-void CVComm::txMonitor(uint32_t* tick) {
-  cvcomm::MsgStream_e stream = cvcomm::MsgStream::BOARD2PC;
-
-  txMsg(stream, cvcomm::MsgType::GENERAL);
-  osDelayUntil(tick, 5);
-
-  // 自瞄/打符/反符
-  if (mode_ == CVMode::AUTOAIM || mode_ == CVMode::ENERGY ||
-      mode_ == CVMode::ENERGY_DISTURB) {
-    for (int i = 0; i < 20; i++) {
-      txMsg(stream, cvcomm::MsgType::AIM_SHOOT);
-      osDelayUntil(tick, 5);
-    }
-  }
-  // 导航
-  else if (mode_ == CVMode::NAVIGATION) {
-    for (int i = 0; i < 20; i++) {
-      txMsg(stream, cvcomm::MsgType::NAVIGATION);
-      osDelayUntil(tick, 5);
-    }
-  }
-  // 决策（导航+自瞄）
-  else if (mode_ == CVMode::DECISION) {
-    for (int i = 0; i < 10; i++) {
-      txMsg(stream, cvcomm::MsgType::AIM_SHOOT);
-      osDelayUntil(tick, 5);
-      txMsg(stream, cvcomm::MsgType::NAVIGATION);
-      osDelayUntil(tick, 5);
-    }
-    txMsg(stream, cvcomm::MsgType::GAME_STATUS);
-    osDelayUntil(tick, 10);
-  } else {
-    osDelayUntil(tick, 95);
-  }
 }
 
 // Data transmit 数据发送
-void CVComm::txMsg(cvcomm::MsgStream_e msg_stream, cvcomm::MsgType_e msg_type) {
+template <typename T>
+void CVComm::txMsg(cvcomm::MsgStream_e msg_stream, cvcomm::MsgType_e msg_type,
+                   const T& msg) {
   // start of frame(0x23)
   tx_.frame.sof = CV_COMM_SOF;
   memcpy(tx_.buf, &tx_.frame.sof, sizeof(tx_.frame.sof));
@@ -98,27 +61,28 @@ void CVComm::txMsg(cvcomm::MsgStream_e msg_stream, cvcomm::MsgType_e msg_type) {
   tx_.pack_size += sizeof(tx_.frame.pack_id);
 
   // data
-  if (msg_stream == cvcomm::MsgStream::PC2BOARD) {
-    if (msg_type == cvcomm::MsgType::GENERAL) {
-      appendTxData(general_pc2board_msg_);
-    } else if (msg_type == cvcomm::MsgType::AIM_SHOOT) {
-      appendTxData(aim_shoot_pc2board_msg_);
-    } else if (msg_type == cvcomm::MsgType::NAVIGATION) {
-      appendTxData(navigation_pc2board_msg_);
-    } else if (msg_type == cvcomm::MsgType::GAME_STATUS) {
-      appendTxData(game_status_pc2board_msg_);
-    }
-  } else if (msg_stream == cvcomm::MsgStream::BOARD2PC) {
-    if (msg_type == cvcomm::MsgType::GENERAL) {
-      appendTxData(general_board2pc_msg_);
-    } else if (msg_type == cvcomm::MsgType::AIM_SHOOT) {
-      appendTxData(aim_shoot_board2pc_msg_);
-    } else if (msg_type == cvcomm::MsgType::NAVIGATION) {
-      appendTxData(navigation_board2pc_msg_);
-    } else if (msg_type == cvcomm::MsgType::GAME_STATUS) {
-      appendTxData(game_status_board2pc_msg_);
-    }
-  }
+  appendTxData(msg);
+  //  if (msg_stream == cvcomm::MsgStream::PC2BOARD) {
+  //    if (msg_type == cvcomm::MsgType::GENERAL) {
+  //      appendTxData(general_pc2board_msg_);
+  //    } else if (msg_type == cvcomm::MsgType::AIM_SHOOT) {
+  //      appendTxData(aim_shoot_pc2board_msg_);
+  //    } else if (msg_type == cvcomm::MsgType::NAVIGATION) {
+  //      appendTxData(navigation_pc2board_msg_);
+  //    } else if (msg_type == cvcomm::MsgType::GAME_STATUS) {
+  //      appendTxData(game_status_pc2board_msg_);
+  //    }
+  //  } else if (msg_stream == cvcomm::MsgStream::BOARD2PC) {
+  //    if (msg_type == cvcomm::MsgType::GENERAL) {
+  //      appendTxData(general_board2pc_msg_);
+  //    } else if (msg_type == cvcomm::MsgType::AIM_SHOOT) {
+  //      appendTxData(aim_shoot_board2pc_msg_);
+  //    } else if (msg_type == cvcomm::MsgType::NAVIGATION) {
+  //      appendTxData(navigation_board2pc_msg_);
+  //    } else if (msg_type == cvcomm::MsgType::GAME_STATUS) {
+  //      appendTxData(game_status_board2pc_msg_);
+  //    }
+  //  }
 
   // tail(crc16)
   tx_.pack_size += sizeof(tx_.frame.crc16);
