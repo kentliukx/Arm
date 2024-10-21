@@ -2,10 +2,10 @@
 // Created by yixin on 2023/2/5.
 //
 
-#include "referee_ui.h"
 #include <cmath>
 #include <cstdarg>
 #include <cstdio>
+
 #include "algorithm/crc/crc.h"
 #include "referee_comm.h"
 #include "referee_protocol.h"
@@ -15,9 +15,11 @@
 #include "main.h"
 #endif
 
-extern UI ui;
+// extern UI ui;
 
 //// UI version 3.4
+
+/*
 
 bool compareGraphicData(graphic_data_struct_t gd1, graphic_data_struct_t gd2) {
   bool r = true;
@@ -164,6 +166,8 @@ FloatNum::FloatNum(const char graphic_name[3], u8 layer, Color color, u8 width,
  *limit
  ******************************************************************************
  **/
+
+/*
 Str::Str(const char graphic_name[3], u8 layer, Color color, u8 size, u8 len,
          u8 width, u16 x, u16 y, const char* __restrict format, ...) {
   graph_data_.graphic_name[0] = graphic_name[0];
@@ -276,6 +280,8 @@ graphic_data_struct_t UI::getGraphData(const char name[3]) {
  * this param is not the number of element you want to move but the used size of
  * list
  */
+
+/*
 inline void moveGraphs(GraphListNode** graphs, uint8_t start_index,
                        uint8_t num) {
   for (uint8_t i = num - 1; i >= start_index; --i) {
@@ -301,7 +307,8 @@ void UI::graphManagerHandle() {
   for (uint8_t i = 0; i < draw_nums; ++i) {
     first_seven_graphs[i] = node;
     node = getCircularNextNode(
-        node);  // 如果前七个全都是优先级最高的，那排序就会失效，而往往最后加入的优先级很高（最后加入的会变成head）
+        node);  //
+如果前七个全都是优先级最高的，那排序就会失效，而往往最后加入的优先级很高（最后加入的会变成head）
   }
 
   node = head_;
@@ -525,3 +532,5 @@ void UI::drawStr(graphic_data_struct_t g_data, char content[30]) {
   graph_n_ = 0;
 }
 //// UI version 3.4
+
+*/

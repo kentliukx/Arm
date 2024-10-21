@@ -11,13 +11,16 @@
 
 #include "interface/callback.h"
 
-#include "base/monitor/motor_monitor.h"
 #include "can.h"
 #include "gpio.h"
 #include "hardware_config.h"
 #include "tim.h"
+
+// #include "app/encoder.h"
+// #include "app/imu_comm.h"
+#include "base/monitor/motor_monitor.h"
 // #include "app/serial_tool.h"
-// #include "base/can_comm/can_packet.h"
+// #include "app/dis_sensor.h"
 #include "common/cap_comm/cap_comm.h"
 // #include "base/cv_comm/cv_comm.h"
 #include "base/remote/remote.h"
@@ -26,33 +29,33 @@
 extern RC rc;
 // extern CVComm cv_comm;
 extern RefereeComm referee;
-extern CapComm ultra_cap;
+// extern ImuComm imu_comm;
+// extern ControllerComm controller_comm;
 // extern SerialStudio serial_tool;
-// extern CanReceivePacket* can_receive_packets[CAN_RECEIVE_PACKET_NUMBER];
+// extern JMEncoder j2_encoder, j3_encoder;
+// extern TOFSenseDriver TOFdriver;
 
 // CAN receive callback
 // CAN接收回调
-// void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan) {
-//  CAN_RxHeaderTypeDef rx_header;
-//  uint8_t rx_data[8];
-//  HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data);
-//
-//  motorsCanRxMsgHandle(hcan, rx_header, rx_data);
-//  if (ultra_cap.canRxMsgCheck(hcan, rx_header)) {
-//    ultra_cap.canRxMsgCallback(hcan, rx_header, rx_data);
-//  } else {
-//    for (int i = 0; i < CAN_RECEIVE_PACKET_NUMBER; i++) {
-//      if (can_receive_packets[i] == nullptr) {
-//        // CAN 包数量设置错误
-//        break;
-//      }
-//      if (can_receive_packets[i]->if_this_packet(hcan, rx_header.StdId)) {
-//        can_receive_packets[i]->handle(rx_data);
-//        break;
-//      }
-//    }
-//  }
-//}
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan) {
+  CAN_RxHeaderTypeDef rx_header;
+  uint8_t rx_data[8];
+  HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data);
+
+  motorsCanRxMsgHandle(hcan, rx_header, rx_data);
+  //  if (imu_comm.canRxMsgCheck(hcan, rx_header)) {
+  //    imu_comm.canRxMsgCallback(hcan, rx_header, rx_data);
+  //  }
+  //  if (j2_encoder.canRxMsgCheck(hcan, rx_header)) {
+  //    j2_encoder.canRxMsgCallback(hcan, rx_header, rx_data);
+  //  }
+  //  if (j3_encoder.canRxMsgCheck(hcan, rx_header)) {
+  //    j3_encoder.canRxMsgCallback(hcan, rx_header, rx_data);
+  //  }
+  //  if (j2_dis.canRxMsgCheck(hcan, rx_header)) {
+  //    j2_dis.canRxMsgCallback(hcan, rx_header, rx_data);
+  //  }
+}
 
 // UART transmit callback
 // UART发送中断回调
@@ -61,11 +64,8 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {}
 // UART receive callback
 // UART接收中断回调
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
-  if (rc.uartCheck(huart)) {
-    rc.rxCallback();
-  }
-  //  if (cv_comm.uartCheck(huart)) {
-  //    cv_comm.rxCallback();
+  //  if (TOFdriver.uartCheck(huart)) {
+  //    TOFdriver.rxCallback();
   //  }
   if (referee.uartCheck(huart)) {
     referee.rxCallback();
@@ -75,6 +75,17 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
   //  }
 }
 
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef* huart, uint16_t Size) {
+  //    if (cv_comm.uartCheck(huart)) {
+  //        cv_comm.rxCallback();
+  //    }
+  //    if (controller_comm.uartCheck(huart)) {
+  //        controller_comm.rxCallback();
+  //    }
+  if (rc.uartCheck(huart)) {
+    rc.rxCallback();
+  }
+}
 // UART idle callback. Called in stm32f4xx_it.c USARTx_IRQHandler()
 // UART空闲中断处理，在stm32f4xx_it.c的USARTx_IRQHandler()函数中调用
 void User_UART_IdleHandler(UART_HandleTypeDef* huart) {

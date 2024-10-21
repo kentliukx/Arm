@@ -16,11 +16,22 @@
 // Motor parameter config
 // 电机参数配置
 
+// 底盘电机
+const PID chassis_wheel_spid(40, 4, 10, 4000, 16384);
+Motor CMFL(Motor::M3508, 3591.f / 187.f, Motor::SPEED,  // type, ratio, method
+           PID(), PID(chassis_wheel_spid));             // ppid, spid
+Motor CMFR(Motor::M3508, 3591.f / 187.f, Motor::SPEED,  // type, ratio, method
+           PID(), PID(chassis_wheel_spid));             // ppid, spid
+Motor CMBL(Motor::M3508, 3591.f / 187.f, Motor::SPEED,  // type, ratio, method
+           PID(), PID(chassis_wheel_spid));             // ppid, spid
+Motor CMBR(Motor::M3508, 3591.f / 187.f, Motor::SPEED,  // type, ratio, method
+           PID(), PID(chassis_wheel_spid));             // ppid, spid
+
 Motor* can1_dji_motor[11] = {
-    nullptr,  // id:1
-    nullptr,  // id:2
-    nullptr,  // id:3
-    nullptr,  // id:4
+    &CMFL,    // id:1
+    &CMFR,    // id:2
+    &CMBL,    // id:3
+    &CMBR,    // id:4
     nullptr,  // id:5
     nullptr,  // id:6
     nullptr,  // id:7

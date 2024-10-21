@@ -11,6 +11,11 @@
 
 #include "control.h"
 
+#include "base/monitor/motor_monitor.h"
+#include "base/motor/motor.h"
+
+extern Motor CMFL;
+
 // 全局变量声明
 extern RC rc;
 

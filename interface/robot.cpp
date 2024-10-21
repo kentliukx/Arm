@@ -18,6 +18,7 @@
 // #include "app/client_ui.h"
 #include "app/control/control.h"
 // #include "app/imu_monitor.h"
+#include "base/monitor/can_monitor.h"
 #include "base/monitor/motor_monitor.h"
 // #include "app/serial_tool.h"
 #include "common/cap_comm/cap_comm.h"
@@ -89,13 +90,13 @@ void motorTask(void const* argument) {
   }
 }
 
-// osThreadId canTaskHandle;
-// void canTask(void const* argument) {
-//   canFilterInit();
-//   for (;;) {
-//     canTxMonitor();
-//   }
-// }
+osThreadId canTaskHandle;
+void canTask(void const* argument) {
+  canFilterInit();
+  for (;;) {
+    canTxMonitor();
+  }
+}
 
 // osThreadId imuTaskHandle;
 // void imuTask(void const* argument) {
@@ -144,9 +145,10 @@ void rtosTaskInit(void) {
   motorTaskHandle = osThreadCreate(osThread(motor_task), NULL);
 
   osThreadDef(app_task, appTask, osPriorityHigh, 0, 128);
+  appTaskHandle = osThreadCreate(osThread(app_task), NULL);
 
-  //  osThreadDef(can_task, canTask, osPriorityHigh, 0, 128);
-  //  canTaskHandle = osThreadCreate(osThread(can_task), NULL);
+  osThreadDef(can_task, canTask, osPriorityHigh, 0, 128);
+  canTaskHandle = osThreadCreate(osThread(can_task), NULL);
 
   //  osThreadDef(imu_task, imuTask, osPriorityRealtime, 0, 128);
   //  imuTaskHandle = osThreadCreate(osThread(imu_task), NULL);
