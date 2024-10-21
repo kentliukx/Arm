@@ -8,12 +8,12 @@
  ******************************************************************************
  */
 
-#include "common/referee_comm/referee_comm.h"
-//#include "app/shoot.h"
+#include "referee_comm.h"
+// #include "app/shoot.h"
 #include "algorithm/crc/crc.h"
 #include "referee_ui.h"
 
-//extern Shoot shoot;
+// extern Shoot shoot;
 
 const uint32_t referee_comm_timout = 1000;  // ms
 
@@ -184,8 +184,8 @@ void RefereeComm::rxCallback(void) {
       memcpy(&robot_hurt_, rx_.buf + data_offset, rx_.frame.header.data_len);
     } else if (rx_.frame.cmd_id == SHOOT_DATA_ID) {
       memcpy(&shoot_data_, rx_.buf + data_offset, rx_.frame.header.data_len);
-  // todo
-  // shoot.new_bullet();
+      // todo
+      // shoot.new_bullet();
 
     } else if (rx_.frame.cmd_id == BULLET_REMAINING_ID) {
       memcpy(&bullet_remaining_, rx_.buf + data_offset,
@@ -214,6 +214,4 @@ void RefereeComm::rxCallback(void) {
   }
 }
 
-UART_HandleTypeDef* RefereeComm::getHuart() const {
-  return huart_;
-}
+UART_HandleTypeDef* RefereeComm::getHuart() const { return huart_; }
