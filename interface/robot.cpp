@@ -21,29 +21,28 @@
 #include "base/monitor/can_monitor.h"
 #include "base/monitor/motor_monitor.h"
 // #include "app/serial_tool.h"
-#include "common/cap_comm/cap_comm.h"
+#include "app/communication/comm_monitor.h"
 // #include "base/cv_comm/cv_comm.h"
 #include "base/remote/remote.h"
 #include "base/servo/servo.h"
-#include "common/referee_comm/referee_comm.h"
-#include "common/referee_comm/referee_ui.h"
 
 #ifdef RC_UART
 RC rc(RC_UART);
 #else
 RC rc;
 #endif  // RC_UART
+CommMonitor cm;
 // #ifdef CV_UART
 // CVComm cv_comm(CV_UART);
 // #else
 // CVComm cv_comm;
 // #endif  // CV_UART
-#ifdef REFEREE_UART
-RefereeComm referee(REFEREE_UART);
-// UI ui(REFEREE_UART, &referee, ui_func, sizeof(ui_func) / sizeof(void*));
-#else
-RefereeComm referee;
-#endif  // REFEREE_UART
+// #ifdef REFEREE_UART
+// RefereeComm referee(REFEREE_UART);
+//// UI ui(REFEREE_UART, &referee, ui_func, sizeof(ui_func) / sizeof(void*));
+// #else
+// RefereeComm referee;
+// #endif  // REFEREE_UART
 #ifdef SERVO_UART
 ServoZX361D gate_servo(SERVO_UART);
 #else
@@ -55,7 +54,7 @@ ServoZX361D gate_servo;
 // SerialStudio serial_tool;
 // #endif  // DEBUG_UART
 
-CapComm ultra_cap(&hcan2);
+// CapComm ultra_cap(&hcan2);
 
 /* FreeRTOS tasks-----------------------------------------------------------*/
 osThreadId controlTaskHandle;
@@ -107,15 +106,23 @@ void canTask(void const* argument) {
 //   }
 // }
 
-// osThreadId minipcCommTaskHandle;
-// void minipcCommTask(void const* argument) {
-//   uint32_t tick = osKernelSysTick();
-//   cv_comm.init();
-//   for (;;) {
-//     cv_comm.txMonitor(&tick);
-//   }
-// }
+osThreadId commMonitorTxTaskHandle;
+void commMonitorTxHandle(void const* argument) {
+  uint32_t tick = osKernelSysTick();
+  for (;;) {
+    cm.txHandle(&tick);
+    osDelay(1);
+  }
+}
 
+osThreadId commMonitorRxTaskHandle;
+void commMonitorRxHandle(void const* argument) {
+  cm.init();
+  for (;;) {
+    cm.rxHandle();
+    osDelay(1);
+  }
+}
 // osThreadId refereeCommTaskHandle;
 // void refereeCommTask(void const* argument) {
 //   referee.init();
