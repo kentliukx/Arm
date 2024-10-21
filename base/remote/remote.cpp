@@ -1,15 +1,16 @@
 /**
- ******************************************************************************
- * @file    remote.cpp/h
- * @brief   Remote control. 遥控器
- * @author  Spoon Guan
- ******************************************************************************
- * Copyright (c) 2023 Team JiaoLong-SJTU
- * All rights reserved.
- ******************************************************************************
- */
+******************************************************************************
+* @file    remote.cpp/h
+* @brief   Remote control. 遥控器
+* @author  Spoon Guan
+******************************************************************************
+* Copyright (c) 2023 Team JiaoLong-SJTU
+* All rights reserved.
+******************************************************************************
+*/
 
 #include "base/remote/remote.h"
+
 #include <string.h>
 
 // max time to wait for connect(ms)
@@ -31,8 +32,8 @@ void RC::init(void) {
   rx_len_ = 0;
   reset();
   if (huart_ != nullptr) {
-    __HAL_UART_ENABLE_IT(huart_, UART_IT_IDLE);
-    HAL_UART_Receive_DMA(huart_, rx_buf_, 1);
+    //__HAL_UART_ENABLE_IT(huart_, UART_IT_IDLE);
+    HAL_UARTEx_ReceiveToIdle_DMA(huart_, rx_buf_, 24);
   }
 }
 
@@ -107,9 +108,10 @@ void RC::handle(void) {
 // Update connect status, restart UART(SBUS) receive.
 // 更新连接状态，重新打开UART(SBUS)接收
 void RC::rxCallback(void) {
-  rx_len_++;
+  connect_.refresh();
+  memcpy(rx_data_, rx_buf_, RC_FRAME_LEN);
   if (huart_ != nullptr) {
-    HAL_UART_Receive_DMA(huart_, rx_buf_ + rx_len_, 1);
+    HAL_UARTEx_ReceiveToIdle_DMA(huart_, rx_buf_, 24);
   }
 }
 

@@ -11,7 +11,7 @@ static Publisher_t message_center = {.topic_name = "Message_Manager",
                                      .next_topic_node = NULL};
 
 static void CheckName(char* name) {
-  if (strnlen(name, MAX_TOPIC_NAME_LEN + 1) >= MAX_TOPIC_NAME_LEN) {
+  if (strlen(name) >= MAX_TOPIC_NAME_LEN) {
     //        LOGERROR("EVENT NAME TOO LONG:%s", name);
     while (1)
       ;  // 进入这里说明话题名超出长度限制
@@ -69,7 +69,7 @@ Subscriber_t* SubRegister(char* name, uint8_t data_len) {
   }
   // 若该话题已经有订阅者, 遍历订阅者链表,直到到达尾部
   Subscriber_t* sub = pub->first_subs;  // 作为iterator
-  while (sub->next_subs_queue)  // 遍历订阅了该话题的订阅者链表
+  while (sub->next_subs_queue)          // 遍历订阅了该话题的订阅者链表
   {
     sub =
         sub->next_subs_queue;  // 移动到下一个订阅者,遇到空指针停下,说明到了链表尾部
@@ -86,7 +86,7 @@ uint8_t SubGetMessage(Subscriber_t* sub, void* data_ptr) {
   }
   memcpy(data_ptr, sub->queue[sub->front_idx], sub->data_len);
   sub->front_idx = (sub->front_idx++) % QUEUE_SIZE;  // 队列头索引增加
-  sub->temp_size--;  // pop一个数据,长度减1
+  sub->temp_size--;                                  // pop一个数据,长度减1
   return 1;
 }
 
