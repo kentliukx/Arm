@@ -35,6 +35,8 @@ void allMotorsHandle(void);
 void motorsCanRxMsgHandle(CAN_HandleTypeDef* hcan,
                           CAN_RxHeaderTypeDef rx_header, uint8_t* rx_data);
 
+extern Motor CMFL, CMFR, CMBL, CMBR;
+
 // extern Motor CMFL, CMFR, CMBL, CMBR, GMY, GMP, FRICL, FRICR, STIR, m1;
 // extern Motor STFL, STFR, STBL, STBR;
 // extern Motor* can1_dji_motor[11];
