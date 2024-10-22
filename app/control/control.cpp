@@ -11,10 +11,20 @@
 
 #include "control.h"
 
+#include "algorithm/filter/filter.h"
+#include "app/chassis/MecanumChassis.h"
 #include "base/monitor/motor_monitor.h"
 #include "base/motor/motor.h"
+#include "hardware_config.h"
 
-extern Motor CMFL;
+// 机器人组件定义
+// 底盘
+#ifdef mecanum_chassis
+MecanumChassis chassis(&CMFL, &CMFR, &CMBL, &CMBR, PID(7, 0, 15, 100, 270),
+                       LowPassFilter(5e-3f));
+#endif
+#ifdef swerve_chassis
+#endif
 
 // 全局变量声明
 extern RC rc;
@@ -34,6 +44,7 @@ bool robotStartup(void);
 void robotControl(void);
 void robotCmdSend(void);
 void robotCmdInit(void);
+void ModuleContorl(void);
 
 // 上电状态
 enum RobotPowerState_e {
@@ -205,4 +216,10 @@ void robotControl(void) {
       chassis_ctrl_ref_.wz = wz;
     }
   }
+}
+
+void ModuleControl(void) {
+  chassis.handle();
+  //  gimbal.handle();
+  //  shooter.handle();
 }

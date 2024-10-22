@@ -26,5 +26,7 @@ void controlLoop(void);
 void robotCmdInit(void);
 // 主控发送指令
 void robotCmdSend(void);
+// 机器人模组控制
+void ModuleControl(void);
 
 #endif  // RM_FRAME_CONTROL_H

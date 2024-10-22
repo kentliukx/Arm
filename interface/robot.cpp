@@ -74,9 +74,7 @@ void appTask(void const* argument) {
   robotCmdInit();
   for (;;) {
     robotCmdSend();
-    // chassis.handle();
-    // gimbal.handle();
-    // shooter.handle();
+    ModuleControl();
     osDelay(1);
   }
 }
