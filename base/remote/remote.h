@@ -12,6 +12,7 @@
 #ifndef REMOTE_H
 #define REMOTE_H
 
+#include "algorithm/math/math.h"
 #include "common/connect/connect.h"
 #include "usart.h"
 

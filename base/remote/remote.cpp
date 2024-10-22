@@ -84,11 +84,18 @@ void RC::handle(void) {
   key_ = rx_data_[14] | rx_data_[15] << 8;           // Keyboard
   rc_raw_.ch[4] = rx_data_[16] | rx_data_[17] << 8;  // Dial wheel
 
-  channel_.r_row = rc_raw_.ch[0] - rc_ch_offset;
-  channel_.r_col = rc_raw_.ch[1] - rc_ch_offset;
-  channel_.l_row = rc_raw_.ch[2] - rc_ch_offset;
-  channel_.l_col = rc_raw_.ch[3] - rc_ch_offset;
-  channel_.dial_wheel = rc_raw_.ch[4] - rc_ch_offset;
+  int16_t r_row = rc_raw_.ch[0] - rc_ch_offset;
+  int16_t r_col = rc_raw_.ch[1] - rc_ch_offset;
+  int16_t l_row = rc_raw_.ch[2] - rc_ch_offset;
+  int16_t l_col = rc_raw_.ch[3] - rc_ch_offset;
+  int16_t dial_wheel = rc_raw_.ch[4] - rc_ch_offset;
+
+  channel_.r_row = math::interval_mapping(-660, 660, -1, 1, r_row);
+  channel_.l_row = math::interval_mapping(-660, 660, -1, 1, l_row);
+  channel_.r_col = math::interval_mapping(-660, 660, -1, 1, r_col);
+  channel_.l_col = math::interval_mapping(-660, 660, -1, 1, l_col);
+  channel_.dial_wheel = math::interval_mapping(-660, 660, -1, 1, dial_wheel);
+
   if (rc_raw_.s[0] == 1) {
     switch_.r = UP;
   } else if (rc_raw_.s[0] == 2) {

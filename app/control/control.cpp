@@ -72,7 +72,7 @@ float arm_position_rate = 2e-4f;
 float arm_direction_rate = 3e-6f;
 float arm_joint_rate = 1.5e-6f;
 
-float chassis_speed_rate = 3.6e-3f;
+float chassis_speed_rate = 2.376f;
 float chassis_rotate_rate = 0.72f;
 float chassis_follow_ff_rate = 0.3f;
 float chassis_rand_gyro_rate = 20.f;
