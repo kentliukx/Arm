@@ -46,7 +46,8 @@ class MecanumChassis : public Chassis {
   float half_wheel_base;   // 1/2轮距 (m)
  public:
   // 构造函数
-  MecanumChassis();
+  MecanumChassis(Motor* cmfl, Motor* cmfr, Motor* cmbl, Motor* cmbr,
+                 PID angle_pid, LowPassFilter speed_filter);
   // 底盘角速度前馈
   float feedforward_wz;
   // 电机指针

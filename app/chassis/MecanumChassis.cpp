@@ -4,7 +4,18 @@
 
 #include "MecanumChassis.h"
 
-MecanumChassis::MecanumChassis() {
+MecanumChassis::MecanumChassis(Motor* cmfl, Motor* cmfr, Motor* cmbl,
+                               Motor* cmbr, PID angle_pid,
+                               LowPassFilter speed_filter)
+    : cmfl_(cmfl),
+      cmfr_(cmfr),
+      cmbl_(cmbl),
+      cmbr_(cmbr),
+      angle_pid_(angle_pid),
+      vx_filter_(speed_filter),
+      vy_filter_(speed_filter) {
+  mode_ = Follow;
+  chassis_lock = false;
   chassis_pub_ = PubRegister("chassis_cmd", sizeof(ChassisCtrlCmd));
   chassis_sub_ = SubRegister("chassis_fdb", sizeof(ChassisCtrlCmd));
 }
