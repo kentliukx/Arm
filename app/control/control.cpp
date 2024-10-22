@@ -219,6 +219,12 @@ void robotControl(void) {
 }
 
 void ModuleControl(void) {
+  chassis_ctrl_ref_.follow_fdb_angle = 0;
+  chassis_ctrl_ref_.fdb_angle = 0;
+  if (chassis_ctrl_ref_.mode_ == ChassisMode_e::Follow) {
+    //    chassis_ctrl_ref_.fdb_angle = ;
+    //    chassis_ctrl_ref_.follow_fdb_angle = ;
+  }
   chassis.handle();
   //  gimbal.handle();
   //  shooter.handle();

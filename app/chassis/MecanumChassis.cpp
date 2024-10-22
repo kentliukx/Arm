@@ -70,6 +70,17 @@ void MecanumChassis::fkine(void) {
 void MecanumChassis::handle(void) {
   // 获取控制数据
   SubGetMessage(chassis_sub_, &chassis_cmd_rcv_);
+
+  // Follow模式旋转速度计算
+  fdb_spd.angle = chassis_cmd_rcv_.fdb_angle;
+  if (chassis_cmd_rcv_.mode_ == ChassisMode_e::Follow) {
+    chassis_cmd_rcv_.wz =
+        math::deadBand(angle_pid_.calc(chassis_cmd_rcv_.fdb_angle,
+                                       chassis_cmd_rcv_.follow_fdb_angle),
+                       -5, 5);
+  }
+
+  // 目标速度设置
   SetSpeed(chassis_cmd_rcv_.vx, chassis_cmd_rcv_.vy, chassis_cmd_rcv_.wz);
   SetAngle(chassis_cmd_rcv_.ref_angle);
   if (mode_ != chassis_cmd_rcv_.mode_) {
