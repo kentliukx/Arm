@@ -84,6 +84,7 @@ class SwerveChassis : public Chassis {
   // 指令存放位置
   ChassisCtrlCmd chassis_cmd_rcv_;
 
+ public:
   // 构造函数
   SwerveChassis();
 
