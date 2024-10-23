@@ -178,37 +178,6 @@ void SwerveChassis::DisconnectHandle() {
   }
 }
 
-void SwerveChassis::handle(void) {
-  // 获取控制命令
-  SubGetMessage(chassis_sub_, &chassis_cmd_rcv_);
-
-  // 电机断连处理
-  DisconnectHandle();
-
-  // 读取光电门状态，航向电机复位控制
-  if (type_ == Motor::M3508) {
-    SteeringHandle();
-  }
-
-  // 电机反馈值更新
-  MotorFeedbackUpdate();
-
-  // 正运动学解算，通过反馈轮速
-  fkine();
-
-  // 云台坐标系到底盘坐标系转换
-  CoordinateTransformation();
-
-  // 逆运动学解算
-  ikine();
-
-  // 底盘功率限制
-  //  power_limit.handle(extra_power_max);
-
-  // 设置电机控制量
-  MotorControl();
-}
-
 void SwerveChassis::CoordinateTransformation() {
   chassis_ref_spd_.vx = ref_spd.vx * cosf(math::deg2rad(fdb_spd.angle)) -
                         ref_spd.vy * sinf(math::deg2rad(fdb_spd.angle));
@@ -289,4 +258,41 @@ void SwerveChassis::MotorControl() {
     CMBL_->setSpeed(ref_chassis_.wheel_speed.bl);
     CMBR_->setSpeed(ref_chassis_.wheel_speed.br);
   }
+}
+
+void SwerveChassis::handle(void) {
+  // 获取控制命令
+  SubGetMessage(chassis_sub_, &chassis_cmd_rcv_);
+  SetSpeed(chassis_cmd_rcv_.vx, chassis_cmd_rcv_.vy, chassis_cmd_rcv_.wz);
+  SetAngle(chassis_cmd_rcv_.ref_angle);
+  if (mode_ != chassis_cmd_rcv_.mode_) {
+    LOGINFO("Set chassis mode from %d to %d", mode_, chassis_cmd_rcv_.mode_);
+    mode_ = chassis_cmd_rcv_.mode_;
+  }
+
+  // 电机断连处理
+  DisconnectHandle();
+
+  // 读取光电门状态，航向电机复位控制
+  if (type_ == Motor::M3508) {
+    SteeringHandle();
+  }
+
+  // 电机反馈值更新
+  MotorFeedbackUpdate();
+
+  // 正运动学解算，通过反馈轮速
+  fkine();
+
+  // 云台坐标系到底盘坐标系转换
+  CoordinateTransformation();
+
+  // 逆运动学解算
+  ikine();
+
+  // 底盘功率限制
+  //  power_limit.handle(extra_power_max);
+
+  // 设置电机控制量
+  MotorControl();
 }
