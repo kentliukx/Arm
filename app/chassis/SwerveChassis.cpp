@@ -34,7 +34,9 @@ SwerveChassis::SwerveChassis(Motor* CMFL, Motor* CMFR, Motor* CMBL, Motor* CMBR,
       vy_filter_(speed_filter),
       angle_pid_(angle_pid),
       follow_filter_(LowPassFilter(0.1f)) {
-  mode_ = Follow;
+  mode_ = Lock;
+  chassis_pub_ = PubRegister("chassis_fdb", sizeof(ChassisCtrlCmd));
+  chassis_sub_ = SubRegister("chassis_cmd", sizeof(ChassisCtrlCmd));
 }
 
 void SwerveChassis::ikine(void) {
