@@ -15,9 +15,9 @@ typedef struct ChassisStatus {
 } ChassisStatus_t;
 
 enum ChassisMode_e {
+  Lock,      // 锁定底盘
   Separate,  // 云台底盘分离
   Follow,    // 底盘跟随云台
-  Lock,      // 锁定底盘
 };
 
 class Chassis {
