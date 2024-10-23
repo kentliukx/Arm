@@ -28,10 +28,10 @@ Motor CMBR(Motor::M3508, 3591.f / 187.f, Motor::SPEED,  // type, ratio, method
            PID(), PID(chassis_wheel_spid));             // ppid, spid
 
 Motor* can1_dji_motor[11] = {
-    &CMFL,    // id:1
-    &CMFR,    // id:2
-    &CMBL,    // id:3
-    &CMBR,    // id:4
+    nullptr,  // id:1
+    nullptr,  // id:2
+    nullptr,  // id:3
+    nullptr,  // id:4
     nullptr,  // id:5
     nullptr,  // id:6
     nullptr,  // id:7
@@ -41,10 +41,10 @@ Motor* can1_dji_motor[11] = {
     nullptr   // id:11
 };
 Motor* can2_dji_motor[11] = {
-    nullptr,  // id:1
-    nullptr,  // id:2
-    nullptr,  // id:3
-    nullptr,  // id:4
+    &CMFL,    // id:1
+    &CMFR,    // id:2
+    &CMBL,    // id:3
+    &CMBR,    // id:4
     nullptr,  // id:5
     nullptr,  // id:6
     nullptr,  // id:7
