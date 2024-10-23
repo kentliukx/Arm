@@ -103,7 +103,6 @@ void controlLoop(void) {
   } else if (robot_state == STARTUP) {
     allMotorsOn();                  // 电机上电
     startup_flag = robotStartup();  // 开机状态判断
-    robot_state = WORKING;
   } else if (robot_state == WORKING) {
     allMotorsOn();   // 电机上电
     robotControl();  // 机器人控制
@@ -146,14 +145,15 @@ void robotPowerStateFSM(bool stop_flag) {
 // 重置各功能状态
 void robotReset(void) {
   startup_flag = false;
-  chassis_state = ChassisStateExt_e::FOLLOW;
-  chassis_ctrl_ref_.mode_ = ChassisMode_e::Follow;
+  chassis_state = ChassisStateExt_e::LOCK;
+  chassis_ctrl_ref_.mode_ = ChassisMode_e::Lock;
 }
 
 // 开机上电启动处理
 bool robotStartup(void) {
   bool flag = true;
-  chassis_ctrl_ref_.mode_ = ChassisMode_e::Follow;
+  chassis_ctrl_ref_.mode_ = ChassisMode_e::Separate;
+  chassis_state = ChassisStateExt_e::GYRO;
   //  if (!gimbal.init_.j0_finish) {
   //    chassis.lock_ = true;
   //    flag = false;
