@@ -15,15 +15,6 @@ SwerveChassis::SwerveChassis(Motor* CMFL, Motor* CMFR, Motor* CMBL, Motor* CMBR,
       CMFR_(CMFR),
       CMBL_(CMBL),
       CMBR_(CMBR),
-      // #ifdef M3508_STEERING
-      //       STFL_(STFL, PHOTOGATE_FL_GPIO_Port, PHOTOGATE_FL_Pin,
-      //       STEERING_OFFSET.FL), STFR_(STFR, PHOTOGATE_FR_GPIO_Port,
-      //       PHOTOGATE_FR_Pin, STEERING_OFFSET.FR), STBL_(STBL,
-      //       PHOTOGATE_BL_GPIO_Port, PHOTOGATE_BL_Pin, STEERING_OFFSET.BL),
-      //       STBR_(STBR, PHOTOGATE_BR_GPIO_Port, PHOTOGATE_BR_Pin,
-      //       STEERING_OFFSET.BR), type_(Motor::M3508),
-      // #endif
-      // #ifdef GM6020_STEERING
       STFL_(STFL, STEERING_OFFSET.FL),
       STFR_(STFR, STEERING_OFFSET.FR),
       STBL_(STBL, STEERING_OFFSET.BL),
@@ -40,9 +31,10 @@ SwerveChassis::SwerveChassis(Motor* CMFL, Motor* CMFR, Motor* CMBL, Motor* CMBR,
 }
 
 void SwerveChassis::ikine(void) {
-  float& vx = chassis_ref_spd_.vx;
-  float& vy = chassis_ref_spd_.vy;
-  float& wz = chassis_ref_spd_.wz;
+  float& vx = ref_spd.vx;
+  float& vy = ref_spd.vy;
+  float& wz = ref_spd.wz;
+  wz = wz * 60.f / 2.f / PI;
 
   // 将转速（rpm）换算为轮子线速度（m/s）
   float rotate_component =
@@ -247,7 +239,7 @@ void SwerveChassis::MotorControl() {
   STBL_.motor_->setAngle(ref_chassis_.steering_angle.bl);
   STBR_.motor_->setAngle(ref_chassis_.steering_angle.br);
 
-  if (chassis_lock_) {
+  if (mode_ == Lock) {
     CMFL_->setSpeed(0);
     CMFR_->setSpeed(0);
     CMBL_->setSpeed(0);

@@ -54,7 +54,6 @@ class SwerveChassis : public Chassis {
  private:
   const float wheel_radius = 0.06f;  // 轮半径
   const float wheel_base = 0.36f;    // 轴距
-  bool chassis_lock_;
   SwerveStatus_t fdb_chassis_;
   SwerveStatus_t fdb_robot_;
   SwerveStatus_t ref_chassis_;
