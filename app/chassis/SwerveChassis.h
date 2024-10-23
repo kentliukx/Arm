@@ -11,6 +11,7 @@
 #include "base/motor/swerve_steering_motor.h"
 #include "chassis.h"
 #include "cmath"
+#include "common/log/bsp_log.h"
 #include "common/message_center/message_center.h"
 #include "common/message_center/msg_def.h"
 #include "common/power_limit/power_limit.h"
@@ -53,6 +54,7 @@ class SwerveChassis : public Chassis {
  private:
   float wheel_radius;  // 轮半径
   float wheel_base;    // 轴距
+  bool chassis_lock_;
   SwerveStatus_t fdb_chassis_;
   SwerveStatus_t fdb_robot_;
   SwerveStatus_t ref_chassis_;
@@ -96,6 +98,18 @@ class SwerveChassis : public Chassis {
 
   // 坐标系转换
   void CoordinateTransformation(void);
+
+  // 电机反馈处理
+  void MotorFeedbackUpdate(void);
+
+  // 电机控制
+  void MotorControl(void);
+
+  // 舵控制
+  void SteeringHandle(void);
+
+  // 航向电机断联处理
+  void DisconnectHandle(void);
 
   friend class SwerveChassisPower;
 };
