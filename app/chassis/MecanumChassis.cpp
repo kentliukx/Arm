@@ -14,10 +14,10 @@ MecanumChassis::MecanumChassis(Motor* cmfl, Motor* cmfr, Motor* cmbl,
       angle_pid_(angle_pid),
       vx_filter_(speed_filter),
       vy_filter_(speed_filter) {
-  mode_ = Follow;
-  chassis_lock = false;
-  chassis_pub_ = PubRegister("chassis_cmd", sizeof(ChassisCtrlCmd));
-  chassis_sub_ = SubRegister("chassis_fdb", sizeof(ChassisCtrlCmd));
+  mode_ = Lock;
+  chassis_lock = true;
+  chassis_pub_ = PubRegister("chassis_fdb", sizeof(ChassisCtrlCmd));
+  chassis_sub_ = SubRegister("chassis_cmd", sizeof(ChassisCtrlCmd));
 }
 
 void MecanumChassis::ikine(void) {
