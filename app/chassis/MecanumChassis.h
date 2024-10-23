@@ -39,11 +39,11 @@ class MecanumChassis : public Chassis {
   // 底盘反馈数据指针
   ChassisCtrlCmd chassis_cmd_tsm_;
 
-  float x_bias;            // x方向偏移 (底盘前方为正方向) (m)
-  float y_bias;            // y方向偏移 (底盘左方为正方向) (m)
-  float wheel_radius;      // 轮半径 (m)
-  float half_track_width;  // 1/2轴距 (m)
-  float half_wheel_base;   // 1/2轮距 (m)
+  float x_bias = 0;                     // x方向偏移 (底盘前方为正方向) (m)
+  float y_bias = 0;                     // y方向偏移 (底盘左方为正方向) (m)
+  const float wheel_radius = 0.0763f;   // 轮半径 (m)
+  const float half_track_width = 0.2f;  // 1/2轴距 (m)
+  const float half_wheel_base = 0.19f;  // 1/2轮距 (m)
  public:
   // 构造函数
   MecanumChassis(Motor* cmfl, Motor* cmfr, Motor* cmbl, Motor* cmbr,
