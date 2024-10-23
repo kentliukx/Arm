@@ -32,8 +32,7 @@ void MecanumChassis::ikine(void) {
   // 底盘坐标系目标状态->电机转速
   float vx = chassis_ref_spd_.vx;
   float vy = chassis_ref_spd_.vy;
-  float wv = math::dps2radps(chassis_ref_spd_.wz) *
-             (half_track_width + half_wheel_base);
+  float wv = chassis_ref_spd_.wz * (half_track_width + half_wheel_base);
   wheel_ref_.fl = math::radps2dps((-wv + vx - vy) / wheel_radius);
   wheel_ref_.fr = math::radps2dps((-wv - vx - vy) / wheel_radius);
   wheel_ref_.bl = math::radps2dps((-wv + vx + vy) / wheel_radius);
@@ -50,8 +49,9 @@ void MecanumChassis::fkine(void) {
       0.25f * math::dps2radps(rv_fl - rv_fr + rv_bl - rv_br) * wheel_radius;
   chassis_fdb_spd_.vy =
       0.25f * math::dps2radps(-rv_fl - rv_fr + rv_bl + rv_br) * wheel_radius;
-  chassis_fdb_spd_.wz = 0.25f * (-rv_fl - rv_fr - rv_bl - rv_br) *
-                        wheel_radius / (half_track_width + half_wheel_base);
+  chassis_fdb_spd_.wz =
+      math::dps2radps(0.25f * (-rv_fl - rv_fr - rv_bl - rv_br) * wheel_radius /
+                      (half_track_width + half_wheel_base));
   chassis_fdb_spd_.angle = chassis_fdb_spd_.angle + chassis_fdb_spd_.wz * 1e-3f;
   // 底盘坐标系反馈状态->机器人坐标系反馈状态
   fdb_spd.vx =
