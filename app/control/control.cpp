@@ -44,7 +44,7 @@ bool robotStartup(void);
 void robotControl(void);
 void robotCmdSend(void);
 void robotCmdInit(void);
-void ModuleContorl(void);
+void ModuleControl(void);
 
 // 上电状态
 enum RobotPowerState_e {
