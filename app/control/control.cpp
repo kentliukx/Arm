@@ -20,7 +20,8 @@
 // 机器人组件定义
 // 底盘
 #ifdef mecanum_chassis
-MecanumChassis chassis(&CMFL, &CMFR, &CMBL, &CMBR, PID(7, 0, 15, 100, 270),
+MecanumChassis chassis(&CMFL, &CMFR, &CMBL, &CMBR,
+                       PID(7 / 58.f, 0, 15 / 58.f, 100 / 58.f, 270 / 58.f),
                        LowPassFilter(5e-3f));
 #endif
 #ifdef swerve_chassis
@@ -61,6 +62,7 @@ enum ChassisStateExt_e {
   TWIST,
   GYRO,
   GYROCHANGE,
+  RAW,
 } chassis_state;
 
 // 底盘旋转方向
@@ -77,7 +79,7 @@ float chassis_rotate_rate = 0.72f;
 float chassis_follow_ff_rate = 0.3f;
 float chassis_rand_gyro_rate = 20.f;
 
-float gimbal_rate = 2e-4f;
+float gimbal_rate = 3.14f;
 }  // namespace rcctrl
 
 // 初始化标志
@@ -153,7 +155,7 @@ void robotReset(void) {
 bool robotStartup(void) {
   bool flag = true;
   chassis_ctrl_ref_.mode_ = ChassisMode_e::Separate;
-  chassis_state = ChassisStateExt_e::GYRO;
+  chassis_state = ChassisStateExt_e::RAW;
   //  if (!gimbal.init_.j0_finish) {
   //    chassis.lock_ = true;
   //    flag = false;
@@ -214,6 +216,10 @@ void robotControl(void) {
       chassis_ctrl_ref_.vx = rc.channel_.r_col * rcctrl::chassis_speed_rate;
       chassis_ctrl_ref_.vy = -rc.channel_.r_row * rcctrl::chassis_speed_rate;
       chassis_ctrl_ref_.wz = wz;
+    } else if (chassis_state == ChassisStateExt_e::RAW) {
+      chassis_ctrl_ref_.vx = rc.channel_.r_col * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.vy = -rc.channel_.r_row * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.wz = -rc.channel_.l_row * rcctrl::gimbal_rate;
     }
   }
 }
