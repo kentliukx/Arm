@@ -32,8 +32,8 @@ void RC::init(void) {
   rx_len_ = 0;
   reset();
   if (huart_ != nullptr) {
-    //__HAL_UART_ENABLE_IT(huart_, UART_IT_IDLE);
-    HAL_UARTEx_ReceiveToIdle_DMA(huart_, rx_buf_, 24);
+    __HAL_UART_ENABLE_IT(huart_, UART_IT_IDLE);
+    HAL_UART_Receive_DMA(huart_, rx_buf_, 1);
   }
 }
 
@@ -115,10 +115,9 @@ void RC::handle(void) {
 // Update connect status, restart UART(SBUS) receive.
 // 更新连接状态，重新打开UART(SBUS)接收
 void RC::rxCallback(void) {
-  connect_.refresh();
-  memcpy(rx_data_, rx_buf_, RC_FRAME_LEN);
+  rx_len_++;
   if (huart_ != nullptr) {
-    HAL_UARTEx_ReceiveToIdle_DMA(huart_, rx_buf_, 24);
+    HAL_UART_Receive_DMA(huart_, rx_buf_ + rx_len_, 1);
   }
 }
 

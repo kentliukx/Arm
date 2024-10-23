@@ -64,8 +64,11 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {}
 // UART receive callback
 // UART接收中断回调
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
-  //  if (TOFdriver.uartCheck(huart)) {
-  //    TOFdriver.rxCallback();
+  if (rc.uartCheck(huart)) {
+    rc.rxCallback();
+  }
+  //  if (cv_comm.uartCheck(huart)) {
+  //    cv_comm.rxCallback();
   //  }
   if (referee.uartCheck(huart)) {
     referee.rxCallback();
@@ -75,17 +78,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
   //  }
 }
 
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef* huart, uint16_t Size) {
-  //    if (cv_comm.uartCheck(huart)) {
-  //        cv_comm.rxCallback();
-  //    }
-  //    if (controller_comm.uartCheck(huart)) {
-  //        controller_comm.rxCallback();
-  //    }
-  if (rc.uartCheck(huart)) {
-    rc.rxCallback();
-  }
-}
 // UART idle callback. Called in stm32f4xx_it.c USARTx_IRQHandler()
 // UART空闲中断处理，在stm32f4xx_it.c的USARTx_IRQHandler()函数中调用
 void User_UART_IdleHandler(UART_HandleTypeDef* huart) {
