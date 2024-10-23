@@ -64,11 +64,11 @@ class RC {
   Connect connect_;
   // remote channel 遥控器通道
   struct RCChannel {
-    int16_t r_row;
-    int16_t r_col;
-    int16_t l_row;
-    int16_t l_col;
-    int16_t dial_wheel;
+    float r_row;
+    float r_col;
+    float l_row;
+    float l_col;
+    float dial_wheel;
   } channel_;
   // remote switch 遥控器拨挡
   struct RCSwitch {
