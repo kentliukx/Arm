@@ -52,8 +52,8 @@ class SwerveChassis : public Chassis {
                 LowPassFilter speed_filter, PID angle_pid);
 
  private:
-  float wheel_radius;  // 轮半径
-  float wheel_base;    // 轴距
+  const float wheel_radius = 0.06f;  // 轮半径
+  const float wheel_base = 0.36f;    // 轴距
   bool chassis_lock_;
   SwerveStatus_t fdb_chassis_;
   SwerveStatus_t fdb_robot_;
