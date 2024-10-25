@@ -43,6 +43,11 @@ class Motor {
     WORKING,   // 工作
   } Mode_e;
 
+  typedef enum InitMode {
+    None,  // 不需要初始化
+    Hit,   // 撞限位初始化
+  } InitMode_e;
+
   // motor kalman filter parameters(Q & R)
   typedef struct KFParam {
     KFParam(const float& Q11, const float& Q22, const float& R11,
@@ -65,6 +70,7 @@ class Motor {
   Motor(const Type_e& type, const float& ratio, const ControlMethod_e& method,
         const PID& ppid, const PID& spid, bool use_kf = false,
         const KFParam_t& kf_param = KFParam_t(2, 1e4, 1, 0.75, 50),
+        const InitMode_e& init_mode = None, const float& offset = 0,
         float (*model)(const float&, const float&) = nullptr);
 
   // Reset motor
@@ -131,7 +137,9 @@ class Motor {
   Connect connect_;
   Motor::Mode_e mode_;
   Motor::ControlMethod_e method_;
+  Motor::InitMode_e init_mode_;
   float ratio_;  // 减速比
+  float offset_ = 0;
 
   // control value 输出控制量
   float intensity_float_;  // (N.m)
