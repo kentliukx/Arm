@@ -166,7 +166,7 @@ void SwerveChassis::DisconnectHandle() {
   // 轮电机断连处理
   if (!CMFL_->connect_.check() || !CMFR_->connect_.check() ||
       !CMBL_->connect_.check() || !CMBR_->connect_.check()) {
-    chassis_lock_ = true;
+    mode_ = Lock;
   }
 }
 
