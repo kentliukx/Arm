@@ -8,15 +8,9 @@
 #include "base/motor/motor.h"
 #include "base/servo/servo.h"
 
-typedef enum ShootType {
-  Hero,
-  Infantry,
-} ShootType_e;
-
 class Shoot {
  public:
-  Shoot(Motor* fric_l, Motor* fric_r, Motor* stir, Motor* fric_l2 = nullptr,
-        Motor* fric_r2 = nullptr, ShootType_e type = Infantry);
+  Shoot(Motor* fric_l, Motor* fric_r, Motor* stir);
 
   // 发射一发弹丸(发射-true，未发射-false)
   bool shootOneBullet(void);
@@ -47,7 +41,7 @@ class Shoot {
     stir_->control_data_.target_angle = stir_->control_data_.fdb_angle;
   }
 
- private:
+ protected:
   // 射速处理
   void speedHandle(void);
   // 卡弹处理
@@ -61,10 +55,8 @@ class Shoot {
     fric_speed_offset = 0.0f;
   };
 
- private:
+ protected:
   Motor *fric_l_, *fric_r_, *stir_;  // 电机指针
-  Motor *fric_l2_, *fric_r2_;        // 英雄的第二组摩擦轮
-  ShootType_e type_;
 
   bool shoot_state_;  // true-可以发射，false-不能发射
   bool fric_state_;   // 摩擦轮状态，true-开启，false-停止
