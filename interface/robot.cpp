@@ -21,23 +21,22 @@
 #include "base/monitor/can_monitor.h"
 #include "base/monitor/motor_monitor.h"
 // #include "app/serial_tool.h"
-#include "common/cap_comm/cap_comm.h"
-// #include "base/cv_comm/cv_comm.h"
 #include "base/remote/remote.h"
 #include "base/servo/servo.h"
-#include "common/referee_comm/referee_comm.h"
-#include "common/referee_comm/referee_ui.h"
+#include "common/communication/cap_comm/cap_comm.h"
+#include "common/communication/cv_comm/cv_comm.h"
+#include "common/communication/referee_comm/referee_comm.h"
 
 #ifdef RC_UART
 RC rc(RC_UART);
 #else
 RC rc;
 #endif  // RC_UART
-// #ifdef CV_UART
-// CVComm cv_comm(CV_UART);
-// #else
-// CVComm cv_comm;
-// #endif  // CV_UART
+#ifdef CV_UART
+CVComm cv_comm(CV_UART);
+#else
+CVComm cv_comm;
+#endif  // CV_UART
 #ifdef REFEREE_UART
 RefereeComm referee(REFEREE_UART);
 // UI ui(REFEREE_UART, &referee, ui_func, sizeof(ui_func) / sizeof(void*));
@@ -55,7 +54,7 @@ ServoZX361D gate_servo;
 // SerialStudio serial_tool;
 // #endif  // DEBUG_UART
 
-CapComm ultra_cap(&hcan2);
+// CapComm ultra_cap(&hcan2);
 
 /* FreeRTOS tasks-----------------------------------------------------------*/
 osThreadId controlTaskHandle;
@@ -105,25 +104,26 @@ void canTask(void const* argument) {
 //   }
 // }
 
-// osThreadId minipcCommTaskHandle;
-// void minipcCommTask(void const* argument) {
-//   uint32_t tick = osKernelSysTick();
-//   cv_comm.init();
-//   for (;;) {
-//     cv_comm.txMonitor(&tick);
-//   }
-// }
+osThreadId cvCommTaskHandle;
+void cvCommTask(void const* argument) {
+  uint32_t tick = osKernelSysTick();
+  cv_comm.init();
+  for (;;) {
+    cv_comm.txHandle(&tick);
+    osDelay(1);
+  }
+}
 
-// osThreadId refereeCommTaskHandle;
-// void refereeCommTask(void const* argument) {
-//   referee.init();
-//   ui.init();
-//   for (;;) {
-//     referee.handle();
-//     ui.handle();
-//     osDelay(1);
-//   }
-// }
+osThreadId refereeCommTaskHandle;
+void refereeCommTask(void const* argument) {
+  referee.init();
+  //  ui.init();
+  for (;;) {
+    referee.handle();
+    //    ui.handle();
+    osDelay(1);
+  }
+}
 
 // osThreadId serialToolTaskHandle;
 // void serialToolTask(void const* argument) {

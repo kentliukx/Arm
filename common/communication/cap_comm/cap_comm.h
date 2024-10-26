@@ -2,8 +2,9 @@
 ******************************************************************************
 * @file    cap_comm.cpp/h
 * @brief   Capacity communication(CAN). 超级电容通信(CAN)
+* @author Guan Huai
 ******************************************************************************
-* Copyright (c) 2023 Team JiaoLong-SJTU
+* Copyright (c) 2025 Team JiaoLong-SJTU
 * All rights reserved.
 ******************************************************************************
 */
@@ -13,11 +14,14 @@
 
 #include "can.h"
 #include "common/connect/connect.h"
+#include "common/message_center/message_center.h"
+#include "common/message_center/msg_def.h"
 
 class CapComm {
  public:
   CapComm(CAN_HandleTypeDef* hcan);
 
+  void init(void);
   void handle(void);
 
   // Transmit data to capacity
@@ -55,6 +59,8 @@ class CapComm {
   CAN_TxHeaderTypeDef can_tx_header_;
   uint8_t can_tx_data_[8];
   uint32_t can_tx_mail_box_;
+
+  Publisher_t* cap_upload_pub_;
 
   const uint16_t capacity_id_ = 0x301;
   const uint16_t board_id_ = 0x302;

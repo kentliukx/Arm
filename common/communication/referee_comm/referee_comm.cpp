@@ -2,18 +2,19 @@
  ******************************************************************************
  * @file    referee_comm.cpp/h
  * @brief   Referee communication(UART). 裁判系统通信(UART)
+ * @author  Guan Huai
  ******************************************************************************
- * Copyright (c) 2023 Team JiaoLong-SJTU
+ * Copyright (c) 2025 Team JiaoLong-SJTU
  * All rights reserved.
  ******************************************************************************
  */
 
-#include "common/referee_comm/referee_comm.h"
-//#include "app/shoot.h"
+#include "referee_comm.h"
+// #include "app/shoot.h"
 #include "algorithm/crc/crc.h"
 #include "referee_ui.h"
 
-//extern Shoot shoot;
+// extern Shoot shoot;
 
 const uint32_t referee_comm_timout = 1000;  // ms
 
@@ -22,6 +23,7 @@ RefereeComm::RefereeComm(UART_HandleTypeDef* huart)
 
 // Init UART receive 初始化，打开UART接收
 void RefereeComm::init(void) {
+  referee_cv_pub_ = PubRegister("referee_cv", sizeof(RefereeCVData));
   if (huart_ != nullptr) {
     HAL_UART_Receive_IT(huart_, rx_.byte, 1);
   }
@@ -184,8 +186,8 @@ void RefereeComm::rxCallback(void) {
       memcpy(&robot_hurt_, rx_.buf + data_offset, rx_.frame.header.data_len);
     } else if (rx_.frame.cmd_id == SHOOT_DATA_ID) {
       memcpy(&shoot_data_, rx_.buf + data_offset, rx_.frame.header.data_len);
-  // todo
-  // shoot.new_bullet();
+      // todo
+      // shoot.new_bullet();
 
     } else if (rx_.frame.cmd_id == BULLET_REMAINING_ID) {
       memcpy(&bullet_remaining_, rx_.buf + data_offset,
@@ -202,6 +204,14 @@ void RefereeComm::rxCallback(void) {
     }
     rx_.fifo.remove(rx_.expect_size);  // 从缓冲区移除该帧数据
     unpack_step_ = WAIT;               // 重置解包状态
+
+    // publish data
+    static RefereeCVData referee_cv_data;
+    referee_cv_data.robot_id = game_robot_status_.robot_id;
+    referee_cv_data.game_robot_pos_x = game_robot_pos_.x;
+    referee_cv_data.game_robot_pos_y = game_robot_pos_.y;
+    PubPushMessage(referee_cv_pub_, &referee_cv_data);
+
     // 刷新连接状态
     if (unpack_error_ == NO_ERROR) {
       connect_.refresh();
@@ -214,6 +224,4 @@ void RefereeComm::rxCallback(void) {
   }
 }
 
-UART_HandleTypeDef* RefereeComm::getHuart() const {
-  return huart_;
-}
+UART_HandleTypeDef* RefereeComm::getHuart() const { return huart_; }

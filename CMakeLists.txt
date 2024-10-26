@@ -85,7 +85,6 @@ target_link_libraries(interface ${libs} ${mcu}_driver base app algorithm middlew
 
 # executable file(.elf .hex .bin)
 add_executable(${PROJECT_NAME}.elf ${mcu_src} ${interface_src} ${linker_scrpit})
-target_link_directories(${PROJECT_NAME}.elf PRIVATE mcu/${mcu}/Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F)
 target_link_libraries(${PROJECT_NAME}.elf ${libs} ${mcu}_driver interface)
 #target_link_libraries(${PROJECT_NAME}.elf ${mcu_include})
 

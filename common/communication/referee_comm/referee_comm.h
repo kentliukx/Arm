@@ -2,8 +2,9 @@
  ******************************************************************************
  * @file    referee_comm.cpp/h
  * @brief   Referee communication(UART). 裁判系统通信(UART)
+ * @author  Guan Huai
  ******************************************************************************
- * Copyright (c) 2023 Team JiaoLong-SJTU
+ * Copyright (c) 2025 Team JiaoLong-SJTU
  * All rights reserved.
  ******************************************************************************
  */
@@ -11,8 +12,10 @@
 #ifndef REFEREE_COMM_H
 #define REFEREE_COMM_H
 
-#include "common/connect/connect.h"
 #include "algorithm/fifo_buffer/fifo_buffer.h"
+#include "common/connect/connect.h"
+#include "common/message_center/message_center.h"
+#include "common/message_center/msg_def.h"
 #include "referee_protocol.h"
 #include "usart.h"
 
@@ -68,6 +71,8 @@ class RefereeComm {
 
  private:
   UART_HandleTypeDef* huart_;
+
+  Publisher_t* referee_cv_pub_;
 
   struct Tx_t {
     uint8_t buf[REFEREE_TX_BUF_SIZE];

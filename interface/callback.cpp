@@ -21,14 +21,16 @@
 #include "base/monitor/motor_monitor.h"
 // #include "app/serial_tool.h"
 // #include "app/dis_sensor.h"
-#include "common/cap_comm/cap_comm.h"
+#include "common/communication/cap_comm/cap_comm.h"
+#include "common/communication/cv_comm/cv_comm.h"
+#include "common/communication/referee_comm/referee_comm.h"
 // #include "base/cv_comm/cv_comm.h"
 #include "base/remote/remote.h"
-#include "common/referee_comm/referee_comm.h"
 
 extern RC rc;
-// extern CVComm cv_comm;
+extern CVComm cv_comm;
 extern RefereeComm referee;
+
 // extern ImuComm imu_comm;
 // extern ControllerComm controller_comm;
 // extern SerialStudio serial_tool;
@@ -43,6 +45,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan) {
   HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data);
 
   motorsCanRxMsgHandle(hcan, rx_header, rx_data);
+  //  cap_comm.canRxMsgCallback(hcan, rx_header, rx_data);
   //  if (imu_comm.canRxMsgCheck(hcan, rx_header)) {
   //    imu_comm.canRxMsgCallback(hcan, rx_header, rx_data);
   //  }
@@ -64,6 +67,9 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart) {}
 // UART receive callback
 // UART接收中断回调
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
+  if (cv_comm.uartCheck(huart)) {
+    cv_comm.rxCallback();
+  }
   if (rc.uartCheck(huart)) {
     rc.rxCallback();
   }
@@ -73,6 +79,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
   if (referee.uartCheck(huart)) {
     referee.rxCallback();
   }
+  //  if (TOFdriver.uartCheck(huart)) {
+  //    TOFdriver.rxCallback();
+  //  }
   //  if (serial_tool.uartCheck(huart)) {
   //    serial_tool.uartRxCallback();
   //  }
