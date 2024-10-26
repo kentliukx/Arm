@@ -138,6 +138,7 @@ class Motor {
     uint8_t can_channel;  // CAN通道1/2
     uint8_t id;           // id
     float max_intensity;  // 控制信号限幅
+    float max_torque;     // 最大输出力矩，用于判断堵转
   } info_;
 
   Connect connect_;

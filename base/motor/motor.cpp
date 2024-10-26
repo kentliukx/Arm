@@ -51,14 +51,18 @@ Motor::Motor(const Type_e& type, const float& ratio,
   // 设定控制信号最大范围
   if (info_.type == Motor::M3508) {
     info_.max_intensity = 16384;
+    info_.max_torque = 16384 * 1.90702994e-5f;
   } else if (info_.type == Motor::M2006) {
     info_.max_intensity = 10000;
+    info_.max_torque = 10000 * 0.00018f;
   } else if (info_.type == Motor::GM6020) {
     info_.max_intensity = 30000;
+    info_.max_torque = 30000 * 5.880969e-5f;
   } else if (info_.type == Motor::MIT) {
     info_.max_intensity = 40;
   } else if (info_.type == Motor::LK_MG4005) {
     info_.max_intensity = 2000;
+    info_.max_torque = 2.5;
   }
   mode_ = INIT;
   setFdbSrc(nullptr, nullptr);
