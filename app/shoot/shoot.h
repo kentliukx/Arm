@@ -7,6 +7,8 @@
 
 #include "base/motor/motor.h"
 #include "base/servo/servo.h"
+#include "common/message_center/message_center.h"
+#include "common/message_center/msg_def.h"
 
 class Shoot {
  public:
@@ -56,6 +58,14 @@ class Shoot {
   };
 
  protected:
+  // 发射机构反馈发布者
+  Publisher_t* shoot_pub_;
+  // 发射机构命令接收者
+  Subscriber_t* shoot_sub_;
+  // 指令存放位置
+  ShootCtrlCmd shoot_cmd_rcv_;
+  ShootFdbData shoot_fdb_send;
+
   Motor *fric_l_, *fric_r_, *stir_;  // 电机指针
 
   bool shoot_state_;  // true-可以发射，false-不能发射
@@ -72,6 +82,7 @@ class Shoot {
   uint32_t cd_;               // 发射间隔(ms)
   uint32_t last_tick_;        // 发射时间记录(ms)
   uint32_t block_tick_;       // 卡弹时间记录(ms)
+  uint32_t last_cmd_tick_;    // 发射命令时间戳记录(ms)
   float calc_heat_;           // 计算热量
   const uint8_t delay_ = 20;  // 发弹延迟(控制+机械延迟，ms)
 
