@@ -48,6 +48,12 @@ class Motor {
     Hit,   // 撞限位初始化
   } InitMode_e;
 
+  typedef enum HitInitState {
+    Prepare,
+    ReverseRotation,
+    Block,
+  } HitInitState_e;
+
   // motor kalman filter parameters(Q & R)
   typedef struct KFParam {
     KFParam(const float& Q11, const float& Q22, const float& R11,
@@ -140,6 +146,8 @@ class Motor {
   Motor::InitMode_e init_mode_;
   float ratio_;  // 减速比
   float offset_ = 0;
+  HitInitState_e init_state_ = Prepare;
+  uint64_t init_tick_;
 
   // control value 输出控制量
   float intensity_float_;  // (N.m)
