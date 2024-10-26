@@ -52,6 +52,7 @@ class Motor {
     Prepare,
     ReverseRotation,
     Block,
+    Ready,
   } HitInitState_e;
 
   // motor kalman filter parameters(Q & R)
