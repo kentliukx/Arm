@@ -23,7 +23,7 @@ Shoot::Shoot(Motor* fric_l, Motor* fric_r, Motor* stir)
       cooling_rate_(10),
       cd_(40) {
   shoot_pub_ = PubRegister("shoot_fdb", sizeof(ShootFdbData));
-  shoot_sub_ = SubRegister("shoot_cmd", sizeof(ShootCtrlCmd));
+  shoot_sub_ = SubRegister("shoot_cmd", sizeof(ShootCtrlCmdBoard));
 }
 
 // 发射一发弹丸(发射-true，未发射-false)
