@@ -825,19 +825,9 @@
           <GroupName>common</GroupName>
           <Files>
             <File>
-              <FileName>board_comm.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\common\board_comm\board_comm.cpp</FilePath>
-            </File>
-            <File>
               <FileName>bool_input.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\common\bool_input\bool_input.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>cap_comm.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\common\cap_comm\cap_comm.cpp</FilePath>
             </File>
             <File>
               <FileName>connect.cpp</FileName>
@@ -860,14 +850,29 @@
               <FilePath>..\..\..\common\power_limit\power_limit.cpp</FilePath>
             </File>
             <File>
+              <FileName>cv_comm.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\common\communication\cv_comm\cv_comm.cpp</FilePath>
+            </File>
+            <File>
               <FileName>referee_comm.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\common\referee_comm\referee_comm.cpp</FilePath>
+              <FilePath>..\..\..\common\communication\referee_comm\referee_comm.cpp</FilePath>
             </File>
             <File>
               <FileName>referee_ui.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\common\referee_comm\referee_ui.cpp</FilePath>
+              <FilePath>..\..\..\common\communication\referee_comm\referee_ui.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>cap_comm.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\common\communication\cap_comm\cap_comm.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>board_comm.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\common\communication\board_comm\board_comm.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -893,6 +898,11 @@
               <FileName>control.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\app\control\control.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>shoot.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\app\shoot\shoot.cpp</FilePath>
             </File>
           </Files>
         </Group>
