@@ -134,11 +134,6 @@ void Shoot::handle(void) {
   SubGetMessage(shoot_sub_, &shoot_cmd_rcv_);
   SubGetMessage(referee_sub_, &referee_data_);
 
-  // 发弹
-  if (shoot_cmd_rcv_.shoot_one_bullet) {
-    ShootOneBullet();
-  }
-
   // 速度上限变化重置自适应弹速
   static float last_limit = speed_limit_;
   if (fabs(speed_limit_ - last_limit) > 0.1f) {
@@ -162,4 +157,9 @@ void Shoot::handle(void) {
   // 判断是否可发射(摩擦轮开 & 未卡弹 & 下一发不会超热量 & 发射未cd)
   shoot_state_ = fric_state_ && !block_state_ && heat_state_ &&
                  HAL_GetTick() - last_tick_ > cd_;
+
+  // 发弹
+  if (shoot_cmd_rcv_.shoot_one_bullet) {
+    ShootOneBullet();
+  }
 }
