@@ -12,6 +12,7 @@
 #include "referee_comm.h"
 // #include "app/shoot.h"
 #include "algorithm/crc/crc.h"
+#include "hardware_config.h"
 #include "referee_ui.h"
 
 // extern Shoot shoot;
@@ -218,12 +219,15 @@ void RefereeComm::rxCallback(void) {
 
     // 发射机构信息填写
     referee_shoot_data.bullet_speed = shoot_data_.bullet_speed;
+#ifdef infantry_shoot
     referee_shoot_data.cooling_heat =
         power_heat_data_.shooter_id1_17mm_cooling_heat;
-    referee_shoot_data.cooling_rate =
-        game_robot_status_.shooter_id1_17mm_cooling_rate;
-    referee_shoot_data.cooling_limit =
-        game_robot_status_.shooter_id1_17mm_cooling_limit;
+#elif defined(hero_shoot)
+    referee_shoot_data.cooling_heat =
+        power_heat_data_.shooter_id1_42mm_cooling_heat;
+#endif
+    referee_shoot_data.cooling_rate = game_robot_status_.shooter_cooling_rate;
+    referee_shoot_data.cooling_limit = game_robot_status_.shooter_cooling_limit;
 
     // 刷新连接状态
     if (unpack_error_ == NO_ERROR) {
