@@ -7,7 +7,7 @@
 const float stir_step_angle = 45;
 const float heat_17mm_bullet = 10;
 
-const float stir_block_torque = 8000;
+const float stir_block_torque = 8000 * 0.00018f;
 const float stir_block_angle = 8 * stir_step_angle;
 
 // 构造函数 参数在使用时务必调整
