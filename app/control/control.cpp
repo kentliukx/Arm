@@ -28,8 +28,6 @@ MecanumChassis chassis(&CMFL, &CMFR, &CMBL, &CMBR,
 #elif defined swerve_chassis
 SwerveChassis chassis(&CMFL, &CMFR, &CMBL, &CMBR, &STFL, &STFR, &STBL, &STBR,
                       LowPassFilter(2e-2f), PID(-1.2, 0, -1, 0, 100));
-#else
-Chassis chassis;
 #endif
 
 #ifdef infantry_shoot
@@ -186,8 +184,12 @@ void robotCmdInit(void) {
 }
 
 void robotCmdSend(void) {
+#if defined(swerve_chassis) || defined(mecanum_chassis)
   SubGetMessage(chassis_fdb_sub_, &chassis_ctrl_fdb_);
   PubPushMessage(chassis_cmd_pub_, &chassis_ctrl_ref_);
+#endif
+#if defined(infantry_shoot)
+#endif
 }
 
 void robotControl(void) {
@@ -240,7 +242,11 @@ void ModuleControl(void) {
     //    chassis_ctrl_ref_.fdb_angle = ;
     //    chassis_ctrl_ref_.follow_fdb_angle = ;
   }
+#if defined swerve_chassis || defined mecanum_chassis
   chassis.handle();
+#endif
   //  gimbal.handle();
-  //  shooter.handle();
+#if defined infantry_shoot
+  shoot.handle();
+#endif
 }
