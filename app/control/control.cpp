@@ -14,6 +14,7 @@
 #include "algorithm/filter/filter.h"
 #include "app/chassis/MecanumChassis.h"
 #include "app/chassis/SwerveChassis.h"
+#include "app/shoot/shoot.h"
 #include "base/monitor/motor_monitor.h"
 #include "base/motor/motor.h"
 #include "hardware_config.h"
@@ -24,11 +25,14 @@
 MecanumChassis chassis(&CMFL, &CMFR, &CMBL, &CMBR,
                        PID(7 / 58.f, 0, 15 / 58.f, 100 / 58.f, 270 / 58.f),
                        LowPassFilter(5e-3f));
-#endif
-#ifdef swerve_chassis
+#elif defined swerve_chassis
 SwerveChassis chassis(&CMFL, &CMFR, &CMBL, &CMBR, &STFL, &STFR, &STBL, &STBR,
                       LowPassFilter(2e-2f), PID(-1.2, 0, -1, 0, 100));
+#else
+Chassis chassis;
 #endif
+
+Shoot shoot(&FRICL, &FRICR, &STIR);
 
 // 全局变量声明
 extern RC rc;
