@@ -32,7 +32,9 @@ SwerveChassis chassis(&CMFL, &CMFR, &CMBL, &CMBR, &STFL, &STFR, &STBL, &STBR,
 Chassis chassis;
 #endif
 
+#ifdef infantry_shoot
 Shoot shoot(&FRICL, &FRICR, &STIR);
+#endif
 
 // 全局变量声明
 extern RC rc;
