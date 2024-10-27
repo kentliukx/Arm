@@ -5,6 +5,7 @@
 #ifndef RM_FRAME_SHOOT_H
 #define RM_FRAME_SHOOT_H
 
+#include "algorithm/math/math.h"
 #include "base/motor/motor.h"
 #include "base/servo/servo.h"
 #include "common/message_center/message_center.h"
@@ -15,7 +16,7 @@ class Shoot {
   Shoot(Motor* fric_l, Motor* fric_r, Motor* stir);
 
   // 发射一发弹丸(发射-true，未发射-false)
-  bool shootOneBullet(void);
+  bool ShootOneBullet(void);
   // 发射数据处理
   void handle(void);
   // 设置射击参数
