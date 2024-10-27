@@ -21,7 +21,7 @@ typedef struct {
 typedef struct {
   uint8_t shoot_one_bullet;  // 0表示不发射，1表示发射
   uint32_t cmd_tick;         // 命令时间戳
-} ShootCtrlCmdBoard;
+} ShootCtrlCmd;
 
 typedef struct {
   uint8_t shoot_state;  // 0表示未发射，1表示已发射
@@ -55,7 +55,7 @@ typedef struct {
   uint8_t shoot_flag;  // 发射标志
   uint32_t shoot_id;   // 发射id
   uint8_t enemy_id;    // 敌方id
-} ShootCtrlCmd;
+} ShootCtrlCmdCV;
 
 typedef struct {
   float shoot_speed;      // m/s，射速

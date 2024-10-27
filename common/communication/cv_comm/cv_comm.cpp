@@ -35,7 +35,7 @@ void CVComm::init(void) {
   gimbal_upload_sub_ = SubRegister("gimbal_upload", sizeof(GimbalUploadData));
   shoot_upload_sub_ = SubRegister("shoot_upload", sizeof(ShootUploadData));
   gimbal_cmd_pub_ = PubRegister("gimbal_cmd", sizeof(GimbalCtrlCmd));
-  shoot_cmd_pub_ = PubRegister("shoot_cmd", sizeof(ShootCtrlCmd));
+  shoot_cmd_pub_ = PubRegister("shoot_cmd_cv", sizeof(ShootCtrlCmdCV));
   referee_cv_sub_ = SubRegister("referee_cv", sizeof(RefereeCVData));
 
   if (huart_ != nullptr) {
@@ -299,7 +299,7 @@ void CVComm::rxCallback(void) {
     gimbal_ctrl_cmd_.dist = aim_shoot_pc2board_msg_.dist;
     PubPushMessage(gimbal_cmd_pub_, &gimbal_ctrl_cmd_);
 
-    static ShootCtrlCmd shoot_ctrl_cmd_;
+    static ShootCtrlCmdCV shoot_ctrl_cmd_;
     shoot_ctrl_cmd_.shoot_flag = aim_shoot_pc2board_msg_.shoot_flag;
     shoot_ctrl_cmd_.shoot_id = aim_shoot_pc2board_msg_.shoot_id;
     shoot_ctrl_cmd_.enemy_id = aim_shoot_pc2board_msg_.enemy_id;
