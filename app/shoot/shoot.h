@@ -51,6 +51,8 @@ class Shoot {
   void BlockHandle(void);
   // 热量处理
   void HeatHandle(void);
+  // 过热保护
+  void CoolDown(void);
   // 重置自适应弹速
   inline void ResetSpeedControl() {
     record_count = 0;

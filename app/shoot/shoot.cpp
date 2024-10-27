@@ -151,7 +151,7 @@ void Shoot::handle(void) {
   } else if (shoot_cmd_rcv_.fric_state == 2) {
     FricOn();
   }
-  
+
   // 速度上限变化重置自适应弹速
   static float last_limit = speed_limit_;
   if (fabs(speed_limit_ - last_limit) > 0.1f) {
@@ -172,6 +172,7 @@ void Shoot::handle(void) {
   SpeedHandle();
   BlockHandle();
   HeatHandle();
+  CoolDown();
   // 判断是否可发射(摩擦轮开 & 未卡弹 & 下一发不会超热量 & 发射未cd)
   shoot_state_ = fric_state_ && !block_state_ && heat_state_ &&
                  HAL_GetTick() - last_tick_ > cd_;
@@ -180,4 +181,14 @@ void Shoot::handle(void) {
   if (shoot_cmd_rcv_.shoot_one_bullet) {
     ShootOneBullet();
   }
+}
+
+void Shoot::CoolDown() {
+  float stir_coil_temper = stir_->motor_data_.temp;
+  if (stir_coil_temper > 70) {
+    stir_->ppid_.out_max_ = 0;
+  } else if (stir_coil_temper > 60) {
+    stir_->ppid_.out_max_ = 90000;
+  } else
+    stir_->ppid_.out_max_ = 130000;
 }
