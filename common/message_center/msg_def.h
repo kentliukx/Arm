@@ -76,6 +76,7 @@ typedef struct {
   uint8_t if_connect;
   float cooling_limit;
   float cooling_rate;
+  uint8_t new_bullet;
 } RefereeShootFdb;
 
 #endif  // RM_FRAME_MSG_DEF_H

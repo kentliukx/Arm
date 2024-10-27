@@ -46,6 +46,9 @@ void RefereeComm::txMsg(void) {
 
 // Data receive callback 接收中断
 void RefereeComm::rxCallback(void) {
+  // 重置new_bullet信号
+  referee_shoot_data.new_bullet = 0;
+
   // 将接收到的1byte数据存入fifo缓冲区
   rx_.fifo.append(rx_.byte, 1);
 
@@ -188,8 +191,7 @@ void RefereeComm::rxCallback(void) {
       memcpy(&robot_hurt_, rx_.buf + data_offset, rx_.frame.header.data_len);
     } else if (rx_.frame.cmd_id == SHOOT_DATA_ID) {
       memcpy(&shoot_data_, rx_.buf + data_offset, rx_.frame.header.data_len);
-      // todo
-      // shoot.new_bullet();
+      referee_shoot_data.new_bullet = 1;
 
     } else if (rx_.frame.cmd_id == BULLET_REMAINING_ID) {
       memcpy(&bullet_remaining_, rx_.buf + data_offset,

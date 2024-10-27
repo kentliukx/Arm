@@ -133,7 +133,9 @@ void Shoot::handle(void) {
   // 接收数据
   SubGetMessage(shoot_sub_, &shoot_cmd_rcv_);
   SubGetMessage(referee_sub_, &referee_data_);
-
+  if (referee_data_.new_bullet) {
+    new_bullet_ = true;
+  }
   // 速度上限变化重置自适应弹速
   static float last_limit = speed_limit_;
   if (fabs(speed_limit_ - last_limit) > 0.1f) {
