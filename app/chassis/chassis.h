@@ -36,13 +36,13 @@ class Chassis {
   ChassisMode_e mode_;
 
   // 逆运动学，底盘状态->轮速
-  virtual void ikine(void);
+  virtual void ikine(void) = 0;
 
   // 正运动学，轮速->底盘状态
-  virtual void fkine(void);
+  virtual void fkine(void) = 0;
 
   // 底盘相关处理
-  virtual void handle(void);
+  virtual void handle(void) = 0;
 
  protected:
   // 设置速度
