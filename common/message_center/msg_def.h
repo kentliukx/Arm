@@ -70,4 +70,12 @@ typedef struct RxMsg {
   float chassis_power;
 } CapUploadData;
 
+typedef struct {
+  float bullet_speed;
+  float cooling_heat;
+  uint8_t if_connect;
+  float cooling_limit;
+  float cooling_rate;
+} RefereeShootFdb;
+
 #endif  // RM_FRAME_MSG_DEF_H
