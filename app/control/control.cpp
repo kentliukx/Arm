@@ -39,8 +39,8 @@ extern RC rc;
 
 // msg接收、发送mailbox
 ChassisCtrlCmd chassis_ctrl_ref_, chassis_ctrl_fdb_;
-ShootCtrlCmd shoot_ctrl_ref;
-ShootFdbData shoot_ctrl_fdb;
+ShootCtrlCmd shoot_ctrl_ref_;
+ShootFdbData shoot_ctrl_fdb_;
 
 // msg的订阅者与发布者
 Subscriber_t *chassis_fdb_sub_, *shoot_fdb_sub_;
@@ -158,6 +158,8 @@ void robotReset(void) {
   startup_flag = false;
   chassis_state = ChassisStateExt_e::LOCK;
   chassis_ctrl_ref_.mode_ = ChassisMode_e::Lock;
+  shoot_ctrl_ref_.fric_state = 1;
+  shoot_ctrl_ref_.stir_reset = 1;
 }
 
 // 开机上电启动处理
@@ -165,6 +167,8 @@ bool robotStartup(void) {
   bool flag = true;
   chassis_ctrl_ref_.mode_ = ChassisMode_e::Separate;
   chassis_state = ChassisStateExt_e::RAW;
+  shoot_ctrl_ref_.fric_state = 0;
+  shoot_ctrl_ref_.stir_reset = 0;
   //  if (!gimbal.init_.j0_finish) {
   //    chassis.lock_ = true;
   //    flag = false;
@@ -193,17 +197,23 @@ void robotCmdSend(void) {
   PubPushMessage(chassis_cmd_pub_, &chassis_ctrl_ref_);
 #endif
 #if defined(infantry_shoot)
-  SubGetMessage(shoot_fdb_sub_, &shoot_ctrl_fdb);
-  PubPushMessage(shoot_cmd_pub_, &shoot_ctrl_ref);
+  SubGetMessage(shoot_fdb_sub_, &shoot_ctrl_fdb_);
+  PubPushMessage(shoot_cmd_pub_, &shoot_ctrl_ref_);
 #endif
 }
 
 void robotControl(void) {
+  // 重置一些冲激信号
+  shoot_ctrl_ref_.shoot_CD = 0;
+  shoot_ctrl_ref_.fric_state = 0;
+
   // 遥控器左上右上
   if (rc.switch_.l == RC::UP && rc.switch_.r == RC::UP) {
+    shoot_ctrl_ref_.fric_state = 2;
+    shoot_ctrl_ref_.shoot_CD = 50;
     if (rc.channel_.l_col > 0.8) {
-      shoot_ctrl_ref.shoot_one_bullet = true;
-      shoot_ctrl_ref.cmd_tick = HAL_GetTick();
+      shoot_ctrl_ref_.shoot_one_bullet = true;
+      shoot_ctrl_ref_.cmd_tick = HAL_GetTick();
     }
   }
   // 遥控器左上右中

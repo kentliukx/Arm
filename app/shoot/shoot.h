@@ -23,11 +23,11 @@ class Shoot {
   void SetShootParam(const float& speed_limit, const float& heat_limit,
                      const float& cooling_rate);
   // 设置最小射击间隔(<20ms)
-  void setCD(const uint32_t& cd) { cd_ = cd; }
+  void SetCD(const uint32_t& cd) { cd_ = cd; }
 
   // 开关摩擦轮
-  void fricOn(void) { fric_state_ = true; }
-  void fricOff(void) { fric_state_ = false; }
+  void FricOn(void) { fric_state_ = true; }
+  void FricOff(void) { fric_state_ = false; }
 
   // 射击速度
   float GetBulletSpeed(void);

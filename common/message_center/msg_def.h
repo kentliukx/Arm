@@ -21,6 +21,9 @@ typedef struct {
 typedef struct {
   uint8_t shoot_one_bullet;  // 0表示不发射，1表示发射
   uint32_t cmd_tick;         // 命令时间戳
+  uint8_t fric_state;        // 0表示保持，1表示关闭，2表示开启
+  uint8_t shoot_CD;          // 设置发弹CD，0就保持
+  uint8_t stir_reset;        // 发送1表示激活
 } ShootCtrlCmd;
 
 typedef struct {

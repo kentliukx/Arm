@@ -133,9 +133,25 @@ void Shoot::handle(void) {
   // 接收数据
   SubGetMessage(shoot_sub_, &shoot_cmd_rcv_);
   SubGetMessage(referee_sub_, &referee_data_);
+  // 接收数据处理
   if (referee_data_.new_bullet) {
     new_bullet_ = true;
   }
+
+  if (shoot_cmd_rcv_.shoot_CD != 0) {
+    SetCD(shoot_cmd_rcv_.shoot_CD);
+  }
+
+  if (shoot_cmd_rcv_.stir_reset) {
+    StirReset();
+  }
+
+  if (shoot_cmd_rcv_.fric_state == 1) {
+    FricOff();
+  } else if (shoot_cmd_rcv_.fric_state == 2) {
+    FricOn();
+  }
+  
   // 速度上限变化重置自适应弹速
   static float last_limit = speed_limit_;
   if (fabs(speed_limit_ - last_limit) > 0.1f) {
