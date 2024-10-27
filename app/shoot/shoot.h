@@ -10,6 +10,11 @@
 #include "base/servo/servo.h"
 #include "common/message_center/message_center.h"
 #include "common/message_center/msg_def.h"
+#include "hardware_config.h"
+
+#ifdef infantry_shoot
+#include "common/heat_limit/heat_limit_infantry.h"
+#endif
 
 class Shoot {
  public:
@@ -49,8 +54,6 @@ class Shoot {
   void SpeedHandle(void);
   // 卡弹处理
   void BlockHandle(void);
-  // 热量处理
-  void HeatHandle(void);
   // 过热保护
   void CoolDown(void);
   // 重置自适应弹速
@@ -77,11 +80,12 @@ class Shoot {
   bool shoot_state_;  // true-可以发射，false-不能发射
   bool fric_state_;   // 摩擦轮状态，true-开启，false-停止
   bool block_state_;  // 卡弹状态，true-卡弹，false-未卡弹
-  bool heat_state_;   // 热量状态，true-剩余热量大于1发弹丸热量
 
-  float speed_limit_;   // 射速上限
-  float heat_limit_;    // 热量上限
-  float cooling_rate_;  // 冷却
+#ifdef infantry_shoot
+  HeatLimitInfantry heat_control_;
+#endif
+
+  float speed_limit_;  // 射速上限
 
   float fric_speed_;          // 摩擦轮转速
   float bullet_speed_;        // 弹速
@@ -89,7 +93,6 @@ class Shoot {
   uint32_t last_tick_;        // 发射时间记录(ms)
   uint32_t block_tick_;       // 卡弹时间记录(ms)
   uint32_t last_cmd_tick_;    // 发射命令时间戳记录(ms)
-  float calc_heat_;           // 计算热量
   const uint8_t delay_ = 20;  // 发弹延迟(控制+机械延迟，ms)
 
   // 自适应弹速相关

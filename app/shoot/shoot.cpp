@@ -5,7 +5,7 @@
 #include "shoot.h"
 
 const float stir_step_angle = 45;
-const float heat_17mm_bullet = 10;
+const float heat_bullet = 10;
 
 const float stir_block_torque = 8000 * 0.00018f;
 const float stir_block_angle = 8 * stir_step_angle;
@@ -17,11 +17,9 @@ Shoot::Shoot(Motor* fric_l, Motor* fric_r, Motor* stir)
       stir_(stir),
       fric_state_(false),
       block_state_(false),
-      heat_state_(true),
       speed_limit_(30),
-      heat_limit_(200),
-      cooling_rate_(10),
-      cd_(40) {
+      cd_(40),
+      heat_control_(200, 10) {
   shoot_pub_ = PubRegister("shoot_fdb", sizeof(ShootFdbData));
   shoot_sub_ = SubRegister("shoot_cmd", sizeof(ShootCtrlCmd));
   referee_sub_ = SubRegister("referee_shoot", sizeof(RefereeShootFdb));
@@ -32,7 +30,7 @@ bool Shoot::ShootOneBullet(void) {
   if (shoot_state_) {
     stir_->targetAngle() -= stir_step_angle;
     last_tick_ = HAL_GetTick();
-    calc_heat_ += heat_17mm_bullet;
+    heat_control_.calc_heat_ += heat_bullet;
   }
   return shoot_state_;
 }
@@ -41,8 +39,8 @@ bool Shoot::ShootOneBullet(void) {
 void Shoot::SetShootParam(const float& speed_limit, const float& heat_limit,
                           const float& cooling_rate) {
   speed_limit_ = speed_limit;
-  heat_limit_ = heat_limit;
-  cooling_rate_ = cooling_rate;
+  heat_control_.heat_limit_ = heat_limit;
+  heat_control_.cooling_rate_ = cooling_rate;
 }
 
 // 射击速度
@@ -86,24 +84,6 @@ void Shoot::BlockHandle(void) {
   } else if (HAL_GetTick() - block_tick_ > 100) {
     // 从卡弹状态下恢复
     block_state_ = false;
-  }
-}
-
-// 热量处理(裁判系统通信热量实时性不够，需自行计算保证不超热量)
-void Shoot::HeatHandle(void) {
-#ifndef REFEREE_DELAY
-  if (referee_data_.if_connect && HAL_GetTick() - last_tick_ > 500) {
-    // 距离上次发射大于500ms，用裁判系统数据更新计算热量
-    // 当裁判系统有延迟时读数可能偏高
-    calc_heat_ = referee_data_.cooling_heat;
-  }
-#endif
-  calc_heat_ = math::limitMin(calc_heat_ - cooling_rate_ * 1e-3f, 0);
-  // 判断下一发是否会超热量
-  if (heat_limit_ - calc_heat_ > heat_17mm_bullet + 10.0f) {
-    heat_state_ = true;
-  } else {
-    heat_state_ = false;
   }
 }
 
@@ -152,6 +132,14 @@ void Shoot::handle(void) {
     FricOn();
   }
 
+#ifndef REFEREE_DELAY
+  if (referee_data_.if_connect && HAL_GetTick() - last_tick_ > 500) {
+    // 距离上次发射大于500ms，用裁判系统数据更新计算热量
+    // 当裁判系统有延迟时读数可能偏高
+    heat_control_.calc_heat_ = referee_data_.cooling_heat;
+  }
+#endif
+
   // 速度上限变化重置自适应弹速
   static float last_limit = speed_limit_;
   if (fabs(speed_limit_ - last_limit) > 0.1f) {
@@ -169,12 +157,14 @@ void Shoot::handle(void) {
     // 连接裁判系统(未连接裁判系统可在control中调用setShootParam设置不同模式的射击参数)
     SetShootParam(30, referee_data_.cooling_limit, referee_data_.cooling_rate);
   }
+
   SpeedHandle();
   BlockHandle();
-  HeatHandle();
+  heat_control_.HeatHandle();
   CoolDown();
+
   // 判断是否可发射(摩擦轮开 & 未卡弹 & 下一发不会超热量 & 发射未cd)
-  shoot_state_ = fric_state_ && !block_state_ && heat_state_ &&
+  shoot_state_ = fric_state_ && !block_state_ && heat_control_.heat_state_ &&
                  HAL_GetTick() - last_tick_ > cd_;
 
   // 发弹
