@@ -39,10 +39,12 @@ extern RC rc;
 
 // msg接收、发送mailbox
 ChassisCtrlCmd chassis_ctrl_ref_, chassis_ctrl_fdb_;
+ShootCtrlCmd shoot_ctrl_ref;
+ShootFdbData shoot_ctrl_fdb;
 
 // msg的订阅者与发布者
-Subscriber_t* chassis_fdb_sub_;
-Publisher_t* chassis_cmd_pub_;
+Subscriber_t *chassis_fdb_sub_, *shoot_fdb_sub_;
+Publisher_t *chassis_cmd_pub_, *shoot_cmd_pub_;
 
 // 函数声明
 void iwdgHandler(bool iwdg_refresh_flag);
@@ -181,6 +183,8 @@ bool robotStartup(void) {
 void robotCmdInit(void) {
   chassis_cmd_pub_ = PubRegister("chassis_cmd", sizeof(ChassisCtrlCmd));
   chassis_fdb_sub_ = SubRegister("chassis_fdb", sizeof(ChassisCtrlCmd));
+  shoot_cmd_pub_ = PubRegister("shoot_cmd", sizeof(ShootCtrlCmd));
+  shoot_fdb_sub_ = SubRegister("shoot_fdb", sizeof(ShootFdbData));
 }
 
 void robotCmdSend(void) {
@@ -189,11 +193,21 @@ void robotCmdSend(void) {
   PubPushMessage(chassis_cmd_pub_, &chassis_ctrl_ref_);
 #endif
 #if defined(infantry_shoot)
+  SubGetMessage(shoot_fdb_sub_, &shoot_ctrl_fdb);
+  PubPushMessage(shoot_cmd_pub_, &shoot_ctrl_ref);
 #endif
 }
 
 void robotControl(void) {
-  if (rc.switch_.l == RC::UP && rc.switch_.r == RC::MID) {
+  // 遥控器左上右上
+  if (rc.switch_.l == RC::UP && rc.switch_.r == RC::UP) {
+    if (rc.channel_.l_col > 0.8) {
+      shoot_ctrl_ref.shoot_one_bullet = true;
+      shoot_ctrl_ref.cmd_tick = HAL_GetTick();
+    }
+  }
+  // 遥控器左上右中
+  else if (rc.switch_.l == RC::UP && rc.switch_.r == RC::MID) {
     // 云台底盘测试
     if (rc.channel_.dial_wheel < -100) {
       // 开陀螺
