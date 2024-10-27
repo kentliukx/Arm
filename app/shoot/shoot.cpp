@@ -24,6 +24,7 @@ Shoot::Shoot(Motor* fric_l, Motor* fric_r, Motor* stir)
       cd_(40) {
   shoot_pub_ = PubRegister("shoot_fdb", sizeof(ShootFdbData));
   shoot_sub_ = SubRegister("shoot_cmd", sizeof(ShootCtrlCmd));
+  referee_sub_ = SubRegister("referee_shoot", sizeof(RefereeShootFdb));
 }
 
 // 发射一发弹丸(发射-true，未发射-false)
@@ -34,4 +35,37 @@ bool Shoot::shootOneBullet(void) {
     calc_heat_ += heat_17mm_bullet;
   }
   return shoot_state_;
+}
+
+// 设置射击参数
+void Shoot::setShootParam(const float& speed_limit, const float& heat_limit,
+                          const float& cooling_rate) {
+  speed_limit_ = speed_limit;
+  heat_limit_ = heat_limit;
+  cooling_rate_ = cooling_rate;
+}
+
+// 射击速度
+float Shoot::getBulletSpeed(void) {
+  if (referee_data_.if_connect && referee_data_.bullet_speed != 0) {
+    bullet_speed_ = referee_data_.bullet_speed;
+  } else {
+    bullet_speed_ = speed_limit_ - 1.0f;  // todo弹速估计
+  }
+  return bullet_speed_;
+}
+
+// 射速处理
+void Shoot::speedHandle(void) {
+  if (!fric_state_) {
+    // 摩擦轮关闭
+    fric_l_->setSpeed(0);
+    fric_r_->setSpeed(0);
+  } else {
+    // 摩擦轮开启
+    // 根据射速上限计算摩擦轮转速(dps) todo: 自适应射速调整
+    fric_speed_ = 1e3f * speed_limit_ + 1e4f - 1452;
+    fric_l_->setSpeed(-(fric_speed_ + fric_speed_offset));
+    fric_r_->setSpeed((fric_speed_ + fric_speed_offset) - 407);
+  }
 }

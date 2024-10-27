@@ -65,6 +65,9 @@ class Shoot {
   // 指令存放位置
   ShootCtrlCmd shoot_cmd_rcv_;
   ShootFdbData shoot_fdb_send;
+  // 裁判系统相关
+  Subscriber_t* referee_sub_;
+  RefereeShootFdb referee_data_;
 
   Motor *fric_l_, *fric_r_, *stir_;  // 电机指针
 
