@@ -38,7 +38,7 @@ bool Shoot::ShootOneBullet(void) {
 }
 
 // 设置射击参数
-void Shoot::setShootParam(const float& speed_limit, const float& heat_limit,
+void Shoot::SetShootParam(const float& speed_limit, const float& heat_limit,
                           const float& cooling_rate) {
   speed_limit_ = speed_limit;
   heat_limit_ = heat_limit;
@@ -46,7 +46,7 @@ void Shoot::setShootParam(const float& speed_limit, const float& heat_limit,
 }
 
 // 射击速度
-float Shoot::getBulletSpeed(void) {
+float Shoot::GetBulletSpeed(void) {
   if (referee_data_.if_connect && referee_data_.bullet_speed != 0) {
     bullet_speed_ = referee_data_.bullet_speed;
   } else {
@@ -56,7 +56,7 @@ float Shoot::getBulletSpeed(void) {
 }
 
 // 射速处理
-void Shoot::speedHandle(void) {
+void Shoot::SpeedHandle(void) {
   if (!fric_state_) {
     // 摩擦轮关闭
     fric_l_->setSpeed(0);
@@ -71,7 +71,7 @@ void Shoot::speedHandle(void) {
 }
 
 // 卡弹处理
-void Shoot::blockHandle(void) {
+void Shoot::BlockHandle(void) {
   if (!block_state_) {
     if (stir_->motor_data_.torque * (stir_->ratio_ > 0 ? 1.0f : -1.0f) <
             -stir_block_torque &&
@@ -90,7 +90,7 @@ void Shoot::blockHandle(void) {
 }
 
 // 热量处理(裁判系统通信热量实时性不够，需自行计算保证不超热量)
-void Shoot::heatHandle(void) {
+void Shoot::HeatHandle(void) {
 #ifndef REFEREE_DELAY
   if (referee_data_.if_connect && HAL_GetTick() - last_tick_ > 500) {
     // 距离上次发射大于500ms，用裁判系统数据更新计算热量
@@ -107,10 +107,10 @@ void Shoot::heatHandle(void) {
   }
 }
 
-void Shoot::bullet_speed_control() {
-  if (getBulletSpeed() > speed_limit_ - 8.0f &&
-      getBulletSpeed() < speed_limit_ + 8.0f) {
-    speed_record[record_count++] = getBulletSpeed();
+void Shoot::BulletSpeedControl() {
+  if (GetBulletSpeed() > speed_limit_ - 8.0f &&
+      GetBulletSpeed() < speed_limit_ + 8.0f) {
+    speed_record[record_count++] = GetBulletSpeed();
   }
   if (record_count == 5) {
     float average_speed = (speed_record[0] + speed_record[1] + speed_record[2] +
@@ -142,23 +142,23 @@ void Shoot::handle(void) {
   // 速度上限变化重置自适应弹速
   static float last_limit = speed_limit_;
   if (fabs(speed_limit_ - last_limit) > 0.1f) {
-    reset_speed_control();
+    ResetSpeedControl();
   }
   last_limit = speed_limit_;
 
   // 检测到发弹，进行弹速控制
   if (new_bullet_) {
     new_bullet_ = false;
-    bullet_speed_control();
+    BulletSpeedControl();
   }
 
   if (referee_data_.if_connect) {
     // 连接裁判系统(未连接裁判系统可在control中调用setShootParam设置不同模式的射击参数)
-    setShootParam(30, referee_data_.cooling_limit, referee_data_.cooling_rate);
+    SetShootParam(30, referee_data_.cooling_limit, referee_data_.cooling_rate);
   }
-  speedHandle();
-  blockHandle();
-  heatHandle();
+  SpeedHandle();
+  BlockHandle();
+  HeatHandle();
   // 判断是否可发射(摩擦轮开 & 未卡弹 & 下一发不会超热量 & 发射未cd)
   shoot_state_ = fric_state_ && !block_state_ && heat_state_ &&
                  HAL_GetTick() - last_tick_ > cd_;

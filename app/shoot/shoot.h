@@ -20,7 +20,7 @@ class Shoot {
   // 发射数据处理
   void handle(void);
   // 设置射击参数
-  void setShootParam(const float& speed_limit, const float& heat_limit,
+  void SetShootParam(const float& speed_limit, const float& heat_limit,
                      const float& cooling_rate);
   // 设置最小射击间隔(<20ms)
   void setCD(const uint32_t& cd) { cd_ = cd; }
@@ -30,29 +30,29 @@ class Shoot {
   void fricOff(void) { fric_state_ = false; }
 
   // 射击速度
-  float getBulletSpeed(void);
+  float GetBulletSpeed(void);
   // 发射延迟
   uint8_t getShootDelay(void) { return delay_; }
 
-  void bullet_speed_control();
+  void BulletSpeedControl();
 
-  void new_bullet() { new_bullet_ = true; }
+  void NewBullet() { new_bullet_ = true; }
 
-  inline float get_speed_target() { return adaptation_target; }
+  inline float GetSpeedTarget() { return adaptation_target; }
 
-  inline void stir_reset() {
+  inline void StirReset() {
     stir_->control_data_.target_angle = stir_->control_data_.fdb_angle;
   }
 
  protected:
   // 射速处理
-  void speedHandle(void);
+  void SpeedHandle(void);
   // 卡弹处理
-  void blockHandle(void);
+  void BlockHandle(void);
   // 热量处理
-  void heatHandle(void);
+  void HeatHandle(void);
   // 重置自适应弹速
-  inline void reset_speed_control() {
+  inline void ResetSpeedControl() {
     record_count = 0;
     adaptation_target = 0.9f * speed_limit_;
     fric_speed_offset = 0.0f;
