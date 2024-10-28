@@ -14,6 +14,7 @@
 #include "algorithm/filter/filter.h"
 #include "app/chassis/MecanumChassis.h"
 #include "app/chassis/SwerveChassis.h"
+#include "app/motorinit/motorinit.h"
 #include "app/shoot/shoot.h"
 #include "base/monitor/motor_monitor.h"
 #include "base/motor/motor.h"
@@ -169,6 +170,10 @@ bool robotStartup(void) {
   chassis_state = ChassisStateExt_e::RAW;
   shoot_ctrl_ref_.fric_state = 0;
   shoot_ctrl_ref_.stir_reset = 0;
+  if (STIR.init_state_ != Motor::Ready) {
+    MotorInit(&STIR);
+    flag = false;
+  }
   //  if (!gimbal.init_.j0_finish) {
   //    chassis.lock_ = true;
   //    flag = false;
@@ -211,14 +216,17 @@ void robotControl(void) {
   if (rc.switch_.l == RC::UP && rc.switch_.r == RC::UP) {
     shoot_ctrl_ref_.fric_state = 2;
     shoot_ctrl_ref_.shoot_CD = 50;
-    if (rc.channel_.l_col > 0.8) {
+    if (rc.channel_.l_col > 0.8 && !shoot_ctrl_ref_.shoot_one_bullet) {
       shoot_ctrl_ref_.shoot_one_bullet = true;
       shoot_ctrl_ref_.cmd_tick = HAL_GetTick();
+    } else if (rc.channel_.l_col < 0.8) {
+      shoot_ctrl_ref_.shoot_one_bullet = false;
     }
   }
   // 遥控器左上右中
   else if (rc.switch_.l == RC::UP && rc.switch_.r == RC::MID) {
     // 云台底盘测试
+    shoot_ctrl_ref_.fric_state = 1;
     if (rc.channel_.dial_wheel < -100) {
       // 开陀螺
       if (rc.channel_.r_col > 300) {

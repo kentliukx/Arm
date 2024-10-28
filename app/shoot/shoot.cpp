@@ -165,7 +165,10 @@ void Shoot::handle(void) {
 
   // 判断是否可发射(摩擦轮开 & 未卡弹 & 下一发不会超热量 & 发射未cd)
   shoot_state_ = fric_state_ && !block_state_ && heat_control_.heat_state_ &&
-                 HAL_GetTick() - last_tick_ > cd_;
+                 HAL_GetTick() - last_tick_ > cd_ &&
+                 last_cmd_tick_ != shoot_cmd_rcv_.cmd_tick;
+
+  last_cmd_tick_ = shoot_cmd_rcv_.cmd_tick;
 
   // 发弹
   if (shoot_cmd_rcv_.shoot_one_bullet) {
