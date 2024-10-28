@@ -52,6 +52,7 @@ class Motor {
     Prepare,
     ReverseRotation,
     Block,
+    Init,
     Ready,
   } HitInitState_e;
 
@@ -75,9 +76,9 @@ class Motor {
 
  public:
   Motor(const Type_e& type, const float& ratio, const ControlMethod_e& method,
-        const PID& ppid, const PID& spid, bool use_kf = false,
+        const PID& ppid, const PID& spid, const InitMode_e& init_mode = None,
+        const float& offset = 0, bool use_kf = false,
         const KFParam_t& kf_param = KFParam_t(2, 1e4, 1, 0.75, 50),
-        const InitMode_e& init_mode = None, const float& offset = 0,
         float (*model)(const float&, const float&) = nullptr);
 
   // Reset motor

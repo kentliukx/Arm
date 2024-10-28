@@ -56,7 +56,7 @@ Motor FRICR(Motor::M3508, 1, Motor::SPEED,  // type, ratio, method
 // 拨盘电机
 Motor STIR(Motor::M2006, -36, Motor::POSITION_SPEED,  // type, ratio, method
            PID(20, 0.1, 10, 10, 2500),                // ppid
-           PID(60, 0.1, 0, 1000, 10000));             // spid
+           PID(60, 0.1, 0, 1000, 10000), Motor::Hit, -2);  // spid
 
 // 上板
 // Motor* can1_dji_motor[11] = {

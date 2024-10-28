@@ -31,8 +31,8 @@ const float kf_x0[2] = {0, 0};
 // Motor构造函数:
 Motor::Motor(const Type_e& type, const float& ratio,
              const ControlMethod_e& method, const PID& ppid, const PID& spid,
-             bool use_kf, const KFParam_t& kf_param,
-             const InitMode_e& init_mode, const float& offset,
+             const InitMode_e& init_mode, const float& offset, bool use_kf,
+             const KFParam_t& kf_param,
              float (*model)(const float&, const float&))
     : connect_(motor::connect_timeout),
       ratio_(ratio),
