@@ -8,6 +8,6 @@
 #include "base/monitor/motor_monitor.h"
 #include "base/motor/motor.h"
 
-void MotorInit(Motor* motor_);
+extern void MotorInit(Motor* motor_);
 
 #endif  // RM_FRAME_MOTORINIT_H
