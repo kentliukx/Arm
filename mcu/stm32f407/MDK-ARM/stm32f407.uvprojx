@@ -874,6 +874,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\common\communication\board_comm\board_comm.cpp</FilePath>
             </File>
+            <File>
+              <FileName>heat_limit_infantry.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\common\heat_limit\heat_limit_infantry.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -903,6 +908,11 @@
               <FileName>shoot.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\app\shoot\shoot.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>motorinit.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\app\motorinit\motorinit.cpp</FilePath>
             </File>
           </Files>
         </Group>
