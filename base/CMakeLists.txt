@@ -10,5 +10,6 @@ aux_source_directory(bsp_led src)
 aux_source_directory(remote src)
 aux_source_directory(tof src)
 aux_source_directory(imu src)
+aux_source_directory(imu/driver src)
 
 add_library(base STATIC ${src})
