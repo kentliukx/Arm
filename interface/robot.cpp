@@ -17,8 +17,8 @@
 // #include "base/monitor/can_monitor.h"
 // #include "app/client_ui.h"
 #include "app/control/control.h"
-// #include "app/imu_monitor.h"
 #include "base/monitor/can_monitor.h"
+#include "base/monitor/imu_monitor.h"
 #include "base/monitor/motor_monitor.h"
 // #include "app/serial_tool.h"
 #include "base/remote/remote.h"
@@ -95,14 +95,14 @@ void canTask(void const* argument) {
   }
 }
 
-// osThreadId imuTaskHandle;
-// void imuTask(void const* argument) {
-//   imu::initAll();
-//   for (;;) {
-//     imu::handleAll();
-//     osDelay(1);
-//   }
-// }
+osThreadId imuTaskHandle;
+void imuTask(void const* argument) {
+  imu::initAll();
+  for (;;) {
+    imu::handleAll();
+    osDelay(1);
+  }
+}
 
 osThreadId cvCommTaskHandle;
 void cvCommTask(void const* argument) {
@@ -148,14 +148,14 @@ void rtosTaskInit(void) {
   osThreadDef(can_task, canTask, osPriorityHigh, 0, 128);
   canTaskHandle = osThreadCreate(osThread(can_task), NULL);
 
-  //  osThreadDef(imu_task, imuTask, osPriorityRealtime, 0, 128);
-  //  imuTaskHandle = osThreadCreate(osThread(imu_task), NULL);
+  osThreadDef(imu_task, imuTask, osPriorityRealtime, 0, 128);
+  imuTaskHandle = osThreadCreate(osThread(imu_task), NULL);
 
   //  osThreadDef(minipc_comm_task, minipcCommTask, osPriorityNormal, 0, 512);
   //  minipcCommTaskHandle = osThreadCreate(osThread(minipc_comm_task), NULL);
 
-  //  osThreadDef(referee_comm_task, refereeCommTask, osPriorityNormal, 0, 512);
-  //  refereeCommTaskHandle = osThreadCreate(osThread(referee_comm_task), NULL);
+  osThreadDef(referee_comm_task, refereeCommTask, osPriorityNormal, 0, 512);
+  refereeCommTaskHandle = osThreadCreate(osThread(referee_comm_task), NULL);
 
   //  osThreadDef(serial_tool_task, serialToolTask, osPriorityLow, 0, 1024);
   //  serialToolTaskHandle = osThreadCreate(osThread(serial_tool_task), NULL);
