@@ -1,5 +1,6 @@
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/cap_comm src)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/cv_comm src)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/referee_comm src)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/imu_comm src)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/board_comm src)
 set(src ${src} PARENT_SCOPE)
