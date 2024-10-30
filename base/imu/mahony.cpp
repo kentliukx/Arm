@@ -10,7 +10,8 @@
  */
 
 #include "base/imu/mahony.h"
-#include "base/common/matrix.h"
+
+#include "algorithm/math/matrix.h"
 
 // Mahony algorithm, sensor data fusion, update quaternion
 // Mahony算法，传感器数据融合，四元数更新
@@ -79,9 +80,7 @@ void Mahony::update(float q[4], float ws[3], float as[3], float ms[3]) {
 
 // Set dt
 // 设置时间步长
-void Mahony::setDt(float dt) {
-  dt_ = dt;
-}
+void Mahony::setDt(float dt) { dt_ = dt; }
 
 // Set sensor fusion coeficient
 // 设置传感器融合系数
