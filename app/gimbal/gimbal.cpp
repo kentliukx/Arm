@@ -25,6 +25,9 @@ Gimbal::Gimbal(Motor* gm_yaw, Motor* gm_pitch, IMU* imu)
   limit_.pitch_min = pitch_min;
   limit_.pitch_max = pitch_max;
   setMode(ENCODER_MODE);
+  gimbal_pub_ = PubRegister("gimbal_fdb", sizeof(GimbalFdbData));
+  gimbal_sub_ = SubRegister("gimbal_cmd", sizeof(GimbalCtrlCmd));
+  chassis_sub_ = SubRegister("chassis_cmd", sizeof(ChassisCtrlCmd));
 }
 
 // Initialize gimbal, reset init flag
@@ -103,4 +106,73 @@ void Gimbal::setMode(GimbalFdbMode_e mode) {
     gm_pitch_->setFdbSrc(&gm_pitch_->motor_data_.angle, &imu_->wxSensor());
   }
   mode_ = mode;
+}
+
+void Gimbal::handle(void) {
+  // 接收数据
+  SubGetMessage(gimbal_sub_, &gimbal_cmd_rcv_);
+  SubGetMessage(chassis_sub_, &chassis_cmd_rcv_);
+
+  if (gimbal_cmd_rcv_.mode == 0) {
+    setMode(IMU_MODE);
+  } else if (gimbal_cmd_rcv_.mode == 1) {
+    setMode(ENCODER_MODE);
+  }
+
+  if (gimbal_cmd_rcv_.init_flag == 1) {
+    init();
+  }
+
+  if (gimbal_cmd_rcv_.first_enter_flag == 1) {
+    setAngle(0, 0);
+  }
+
+  addAngle(gimbal_cmd_rcv_.add_yaw, gimbal_cmd_rcv_.add_pitch);
+
+  if (!init_status_.yaw_finish) {  // yaw初始化未完成
+    init_status_.yaw_finish =
+        gm_yaw_->connect_.check() &&
+        (fabs(gm_yaw_->motor_data_.angle) < gimbal_init_angle_thres);
+    if (init_status_.yaw_finish) {
+      // 检测到初始化完成，速度限制恢复正常
+      gm_yaw_->ppid_.out_max_ = gimbal_speed_max;
+    } else {
+      // 设置初始化速度限制
+      gm_yaw_->ppid_.out_max_ = gimbal_init_speed_max;
+    }
+  }
+
+  if (!init_status_.pitch_finish) {  // pitch初始化未完成
+    // 判断复位是否完成
+    init_status_.pitch_finish =
+        gm_pitch_->connect_.check() &&
+        (fabs(gm_pitch_->motor_data_.angle) < gimbal_init_angle_thres);
+    if (init_status_.pitch_finish) {
+      // 检测到初始化完成，速度限制恢复正常
+      gm_pitch_->ppid_.out_max_ = gimbal_speed_max;
+    } else {
+      // 设置初始化速度限制
+      gm_pitch_->ppid_.out_max_ = gimbal_init_speed_max;
+    }
+  }
+
+  // 云台电机离线处理
+  if (!gm_yaw_->connect_.check() && !gm_pitch_->connect_.check()) {
+    init();
+  }
+
+  // 读取电机控制反馈
+  fdb_.yaw = gm_yaw_->control_data_.fdb_angle;
+  fdb_.pitch = gm_pitch_->control_data_.fdb_angle;
+  fdb_.yaw_speed = gm_yaw_->control_data_.fdb_speed;
+  fdb_.pitch_speed = gm_pitch_->control_data_.fdb_speed;
+
+  yaw_chassis_feedforward =
+      math::deadBand(ref_.yaw_speed - chassis_cmd_rcv_.wz, -15, 15) * 0.05f;
+
+  // 设置电机控制目标角度 & 角速度前馈 & 力矩前馈(补偿)
+  gm_yaw_->setAngleSpeed(ref_.yaw, ref_.yaw_speed + yaw_chassis_feedforward,
+                         00);
+  gm_pitch_->setAngleSpeed(ref_.pitch, ref_.pitch_speed,
+                           pitchCompensate(fdb_.pitch));
 }

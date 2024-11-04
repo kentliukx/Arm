@@ -8,6 +8,8 @@
 #include "algorithm/math/math.h"
 #include "base/imu/imu.h"
 #include "base/motor/motor.h"
+#include "common/message_center/message_center.h"
+#include "common/message_center/msg_def.h"
 #include "stm32f4xx_hal.h"
 
 // 云台反馈模式(imu/编码器)
@@ -68,6 +70,16 @@ class Gimbal {
 
   uint32_t now_tick;
 
+  // 反馈发布者
+  Publisher_t* gimbal_pub_;
+  // 命令接收者
+  Subscriber_t* gimbal_sub_;
+  Subscriber_t* chassis_sub_;
+  // 指令存放位置
+  GimbalCtrlCmd gimbal_cmd_rcv_;
+  GimbalFdbData gimbal_fdb_send;
+  ChassisCtrlCmd chassis_cmd_rcv_;
+
   // 目标状态数据
   GimbalStatus_t ref_;
   // 反馈状态数据
@@ -93,7 +105,7 @@ class Gimbal {
   uint32_t first_init_tick;
   bool if_first_init = false;
   // 陀螺前馈系数
-  const float top_ff_k = 15.0f;
+  float yaw_chassis_feedforward = 0;
 };
 
 #endif  // RM_FRAME_GIMBAL_H
