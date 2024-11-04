@@ -5,8 +5,10 @@
 #ifndef RM_FRAME_GIMBAL_H
 #define RM_FRAME_GIMBAL_H
 
+#include "algorithm/math/math.h"
 #include "base/imu/imu.h"
 #include "base/motor/motor.h"
+#include "stm32f4xx_hal.h"
 
 // 云台反馈模式(imu/编码器)
 typedef enum GimbalFdbMode {
