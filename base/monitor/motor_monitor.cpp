@@ -58,6 +58,16 @@ Motor STIR(Motor::M2006, -36, Motor::POSITION_SPEED,  // type, ratio, method
            PID(20, 0.1, 10, 10, 2500),                // ppid
            PID(60, 0.1, 0, 1000, 10000), Motor::Hit, -2);  // spid
 
+// Gimbal motor 云台电机
+Motor GMY(Motor::GM6020, -1, Motor::POSITION_SPEED,  // type, ratio, method
+          PID(8, 0, 0, 15, 600),                     // ppid
+          PID(300, 2, 0, 500, 30000),                // spid
+          Motor::None, 0, true);                     // use kf
+Motor GMP(Motor::GM6020, 1, Motor::POSITION_SPEED,   // type, ratio, method
+          PID(80, 0, 2000, 15, 1800),                // ppid
+          PID(500, 0, 0, 500, 30000),                // spid
+          Motor::None, 0, true);                     // use kf
+
 // 上板
 // Motor* can1_dji_motor[11] = {
 //    &CMFL,    // id:1
@@ -88,13 +98,13 @@ Motor STIR(Motor::M2006, -36, Motor::POSITION_SPEED,  // type, ratio, method
 
 // 下板
 Motor* can1_dji_motor[11] = {
-    nullptr,  // id:1
+    &FRICR,   // id:1
     nullptr,  // id:2
     &FRICL,   // id:3
-    &FRICR,   // id:4
-    nullptr,  // id:5
+    nullptr,  // id:4
+    &GMP,     // id:5
     nullptr,  // id:6
-    &STIR,    // id:7
+    nullptr,  // id:7
     nullptr,  // id:8
     nullptr,  // id:9
     nullptr,  // id:10
@@ -102,13 +112,13 @@ Motor* can1_dji_motor[11] = {
 };
 Motor* can2_dji_motor[11] = {
     nullptr,  // id:1
-    nullptr,  // id:2
-    nullptr,  // id:3
+    &STIR,    // id:2
+    &CMBL,    // id:3
     nullptr,  // id:4
-    nullptr,  // id:5
-    nullptr,  // id:6
-    nullptr,  // id:7
-    nullptr,  // id:8
+    &CMFL,    // id:5
+    &CMFR,    // id:6
+    &GMY,     // id:7
+    &CMBR,    // id:8
     nullptr,  // id:9
     nullptr,  // id:10
     nullptr   // id:11
