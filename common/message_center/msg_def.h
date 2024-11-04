@@ -51,7 +51,7 @@ typedef struct {
   float yaw_speed;    // dps
   float pitch_speed;  // dps
   float dist;         // m，视觉测量距离
-} GimbalCtrlCmd;
+} GimbalCtrlCmdCV;
 
 // 视觉->发射通信数据
 typedef struct {
@@ -81,5 +81,16 @@ typedef struct {
   float cooling_rate;
   uint8_t new_bullet;
 } RefereeShootFdb;
+
+typedef struct {
+  float add_yaw;
+  float add_pitch;
+  uint8_t first_enter_flag;  // 1表示首次进入
+  uint8_t mode;              // 0为imu, 1为encoder
+  uint8_t init_flag;         // 0不激活初始化, 1激活
+} GimbalCtrlCmd;
+
+typedef struct {
+} GimbalFdbData;
 
 #endif  // RM_FRAME_MSG_DEF_H
