@@ -173,6 +173,5 @@ void Gimbal::handle(void) {
   // 设置电机控制目标角度 & 角速度前馈 & 力矩前馈(补偿)
   gm_yaw_->setAngleSpeed(ref_.yaw, ref_.yaw_speed + yaw_chassis_feedforward,
                          00);
-  gm_pitch_->setAngleSpeed(ref_.pitch, ref_.pitch_speed,
-                           pitchCompensate(fdb_.pitch));
+  gm_pitch_->setAngleSpeed(ref_.pitch, ref_.pitch_speed, 0);
 }
