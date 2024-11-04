@@ -14,8 +14,10 @@
 #include "algorithm/filter/filter.h"
 #include "app/chassis/MecanumChassis.h"
 #include "app/chassis/SwerveChassis.h"
+#include "app/gimbal/gimbal.h"
 #include "app/motorinit/motorinit.h"
 #include "app/shoot/shoot.h"
+#include "base/monitor/imu_monitor.h"
 #include "base/monitor/motor_monitor.h"
 #include "base/motor/motor.h"
 #include "hardware_config.h"
@@ -34,6 +36,8 @@ SwerveChassis chassis(&CMFL, &CMFR, &CMBL, &CMBR, &STFL, &STFR, &STBL, &STBR,
 #ifdef infantry_shoot
 Shoot shoot(&FRICL, &FRICR, &STIR);
 #endif
+
+Gimbal gimbal(&GMY, &GMP, &board_imu);
 
 // 全局变量声明
 extern RC rc;
@@ -277,7 +281,7 @@ void ModuleControl(void) {
 #if defined swerve_chassis || defined mecanum_chassis
   chassis.handle();
 #endif
-  //  gimbal.handle();
+  gimbal.handle();
 #if defined infantry_shoot
   shoot.handle();
 #endif
