@@ -46,10 +46,12 @@ extern RC rc;
 ChassisCtrlCmd chassis_ctrl_ref_, chassis_ctrl_fdb_;
 ShootCtrlCmd shoot_ctrl_ref_;
 ShootFdbData shoot_ctrl_fdb_;
+GimbalCtrlCmd gimbal_ctrl_ref_;
+GimbalFdbData gimbal_ctrl_fdb_;
 
 // msg的订阅者与发布者
-Subscriber_t *chassis_fdb_sub_, *shoot_fdb_sub_;
-Publisher_t *chassis_cmd_pub_, *shoot_cmd_pub_;
+Subscriber_t *chassis_fdb_sub_, *shoot_fdb_sub_, *gimbal_fdb_sub_;
+Publisher_t *chassis_cmd_pub_, *shoot_cmd_pub_, *gimbal_cmd_pub_;
 
 // 函数声明
 void iwdgHandler(bool iwdg_refresh_flag);
@@ -98,6 +100,8 @@ float gimbal_rate = 3.14f;
 
 // 初始化标志
 bool startup_flag = false;
+bool last_gimbal_connect;
+bool gimbal_first_enter_working = true;
 // 遥控器挡位记录
 RC::RCSwitch last_rc_switch;
 RC::RCChannel last_rc_channel;
@@ -112,6 +116,13 @@ void controlInit(void) {
 void controlLoop(void) {
   iwdgHandler(rc.connect_.check());
   robotPowerStateFSM(!rc.connect_.check() || rc.switch_.r == RC::DOWN);
+
+  if (!last_gimbal_connect && GMY.connect_.check()) {
+    gimbal_ctrl_ref_.init_flag = 1;
+  } else {
+    gimbal_ctrl_ref_.init_flag = 0;
+  }
+  last_gimbal_connect = GMY.connect_.check();
 
   if (robot_state == STOP) {
     allMotorsStopShutoff();
@@ -156,6 +167,13 @@ void robotPowerStateFSM(bool stop_flag) {
       robot_state = STOP;
     }
   }
+
+  if (gimbal_first_enter_working) {
+    gimbal_first_enter_working = false;
+    gimbal_ctrl_ref_.first_enter_flag = 1;
+  } else {
+    gimbal_ctrl_ref_.first_enter_flag = 0;
+  }
 }
 
 // 重置各功能状态
@@ -165,6 +183,7 @@ void robotReset(void) {
   chassis_ctrl_ref_.mode_ = ChassisMode_e::Lock;
   shoot_ctrl_ref_.fric_state = 1;
   shoot_ctrl_ref_.stir_reset = 1;
+  gimbal_ctrl_ref_.mode = 0;
 }
 
 // 开机上电启动处理
@@ -174,6 +193,7 @@ bool robotStartup(void) {
   chassis_state = ChassisStateExt_e::RAW;
   shoot_ctrl_ref_.fric_state = 0;
   shoot_ctrl_ref_.stir_reset = 0;
+  gimbal_ctrl_ref_.init_flag = 1;
   if (STIR.init_state_ != Motor::Ready) {
     MotorInit(&STIR);
     flag = false;
@@ -198,6 +218,8 @@ void robotCmdInit(void) {
   chassis_fdb_sub_ = SubRegister("chassis_fdb", sizeof(ChassisCtrlCmd));
   shoot_cmd_pub_ = PubRegister("shoot_cmd", sizeof(ShootCtrlCmd));
   shoot_fdb_sub_ = SubRegister("shoot_fdb", sizeof(ShootFdbData));
+  gimbal_cmd_pub_ = PubRegister("gimbal_cmd", sizeof(GimbalCtrlCmd));
+  gimbal_fdb_sub_ = SubRegister("gimbal_fdb", sizeof(GimbalFdbData));
 }
 
 void robotCmdSend(void) {
@@ -268,6 +290,9 @@ void robotControl(void) {
       chassis_ctrl_ref_.vy = -rc.channel_.r_row * rcctrl::chassis_speed_rate;
       chassis_ctrl_ref_.wz = -rc.channel_.l_row * rcctrl::gimbal_rate;
     }
+
+    gimbal_ctrl_ref_.add_yaw = -rc.channel_.l_row * rcctrl::gimbal_rate;
+    gimbal_ctrl_ref_.add_pitch = -rc.channel_.l_col * rcctrl::gimbal_rate;
   }
 }
 
