@@ -37,7 +37,7 @@ void Gimbal::init(void) {
   init_status_.yaw_finish = false;
   init_status_.pitch_finish = true;
 #else
-  init_status_.yaw_finish = true;
+  init_status_.yaw_finish = false;
   init_status_.pitch_finish = false;
 #endif
   if (!if_first_init) {
@@ -174,4 +174,9 @@ void Gimbal::handle(void) {
   gm_yaw_->setAngleSpeed(ref_.yaw, ref_.yaw_speed + yaw_chassis_feedforward,
                          00);
   gm_pitch_->setAngleSpeed(ref_.pitch, ref_.pitch_speed, 0);
+
+  gimbal_fdb_send.gimbal_yaw_encoder = gm_yaw_->motor_data_.ecd_angle;
+  gimbal_fdb_send.gimbal_yaw_zero = yaw_zero_ecd;
+
+  PubPushMessage(gimbal_pub_, &gimbal_fdb_send);
 }
