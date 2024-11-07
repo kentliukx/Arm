@@ -27,30 +27,17 @@ struct Param {
   // 姿态解算算法参数
   const float dt = 1e-3f;
   const float kg = 5e-3f;
-  //  const float kg = 0;
   const float km = 0;
   const float g_thres = 0.3f;
 
   // 传感器方向变换矩阵(对应不同安装方向，默认为I(3))
-#ifdef SWERVE_MASTER
   const float R_imu[3][3] = {
       {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}};
-#else
-  const float R_imu[3][3] = {
-      {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}};
-#endif
   const float R_mag[3][3] = {
       {0.93f, 0.0f, 0.0f}, {0.0f, 1.03f, 0.0f}, {0.0f, 0.0f, 1.0f}};
 
   // 传感器偏移
-#ifdef SWERVE_MASTER
-  const float gyro_bias[3] = {2.2e-3f, 4.8e-3f, -5.8e-4f};
-#else
-  //  const float gyro_bias[3] = {2.2e-3f, 5.5e-3f, -4.1e-4f};
-  const float gyro_bias[3] = {1.6e-4f, 5.6e-3f, -2.8e-4f};
-
-#endif
-
+  const float gyro_bias[3] = {2.6e-3f, 3e-4f, 3.5e-4f};
   const float accel_bias[3] = {0, 0, 0};
   const float mag_bias[3] = {-13.0f, -0.5f, 30.0f};
   // 加速度计比例
