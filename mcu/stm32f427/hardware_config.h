@@ -17,6 +17,7 @@ extern "C" {
 
 #define mecanum_chassis
 // #define swerve_chassis
+#define infantry_shoot
 
 // 开发板型号
 #define DBA
