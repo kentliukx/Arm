@@ -75,14 +75,14 @@ void MecanumChassis::handle(void) {
   fdb_spd.angle = chassis_cmd_rcv_.fdb_angle;
   if (chassis_cmd_rcv_.mode_ == ChassisMode_e::Follow) {
     chassis_cmd_rcv_.wz =
-        math::deadBand(angle_pid_.calc(chassis_cmd_rcv_.fdb_angle,
-                                       chassis_cmd_rcv_.follow_fdb_angle),
-                       -5, 5);
+        -math::deadBand(angle_pid_.calc(chassis_cmd_rcv_.ref_angle,
+                                        chassis_cmd_rcv_.follow_fdb_angle),
+                        -5 / 58.f, 5 / 58.f);
   }
 
   // 目标速度设置
   SetSpeed(chassis_cmd_rcv_.vx, chassis_cmd_rcv_.vy, chassis_cmd_rcv_.wz);
-  SetAngle(chassis_cmd_rcv_.ref_angle);
+  //  SetAngle(chassis_cmd_rcv_.ref_angle);
   if (mode_ != chassis_cmd_rcv_.mode_) {
     LOGINFO("Set chassis mode from %d to %d", mode_, chassis_cmd_rcv_.mode_);
     mode_ = chassis_cmd_rcv_.mode_;

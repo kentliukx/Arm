@@ -91,6 +91,10 @@ typedef struct {
 } GimbalCtrlCmd;
 
 typedef struct {
+  float gimbal_yaw_encoder;  // yaw轴角度
+  float gimbal_yaw_zero;     // yaw编码器零点
+  uint8_t yaw_init_flag;
+  uint8_t pitch_init_flag;
 } GimbalFdbData;
 
 #endif  // RM_FRAME_MSG_DEF_H

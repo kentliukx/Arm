@@ -95,7 +95,7 @@ float chassis_rotate_rate = 0.72f;
 float chassis_follow_ff_rate = 0.3f;
 float chassis_rand_gyro_rate = 20.f;
 
-float gimbal_rate = 3.14f;
+float gimbal_rate = 0.165f;
 }  // namespace rcctrl
 
 // 初始化标志
@@ -196,7 +196,7 @@ bool robotStartup(void) {
   gimbal_ctrl_ref_.init_flag = 1;
   if (STIR.init_state_ != Motor::Ready) {
     MotorInit(&STIR);
-    flag = false;
+    //    flag = false;
   }
   //  if (!gimbal.init_.j0_finish) {
   //    chassis.lock_ = true;
@@ -231,6 +231,8 @@ void robotCmdSend(void) {
   SubGetMessage(shoot_fdb_sub_, &shoot_ctrl_fdb_);
   PubPushMessage(shoot_cmd_pub_, &shoot_ctrl_ref_);
 #endif
+  SubGetMessage(gimbal_fdb_sub_, &gimbal_ctrl_fdb_);
+  PubPushMessage(gimbal_cmd_pub_, &gimbal_ctrl_ref_);
 }
 
 void robotControl(void) {
@@ -252,6 +254,8 @@ void robotControl(void) {
   // 遥控器左上右中
   else if (rc.switch_.l == RC::UP && rc.switch_.r == RC::MID) {
     // 云台底盘测试
+    chassis_ctrl_ref_.mode_ = Follow;
+    chassis_state = FOLLOW;
     shoot_ctrl_ref_.fric_state = 1;
     if (rc.channel_.dial_wheel < -100) {
       // 开陀螺
@@ -299,9 +303,13 @@ void robotControl(void) {
 void ModuleControl(void) {
   chassis_ctrl_ref_.follow_fdb_angle = 0;
   chassis_ctrl_ref_.fdb_angle = 0;
-  if (chassis_ctrl_ref_.mode_ == ChassisMode_e::Follow) {
-    //    chassis_ctrl_ref_.fdb_angle = ;
-    //    chassis_ctrl_ref_.follow_fdb_angle = ;
+  if (chassis_ctrl_ref_.mode_ == ChassisMode_e::Follow &&
+      robot_state == WORKING) {
+    chassis_ctrl_ref_.fdb_angle =
+        gimbal_ctrl_fdb_.gimbal_yaw_encoder - gimbal_ctrl_fdb_.gimbal_yaw_zero;
+    chassis_ctrl_ref_.follow_fdb_angle = math::loopLimit(
+        gimbal_ctrl_fdb_.gimbal_yaw_encoder - gimbal_ctrl_fdb_.gimbal_yaw_zero,
+        -180, 180);
   }
 #if defined swerve_chassis || defined mecanum_chassis
   chassis.handle();
