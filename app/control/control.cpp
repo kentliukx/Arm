@@ -117,7 +117,8 @@ void controlLoop(void) {
   iwdgHandler(rc.connect_.check());
   robotPowerStateFSM(!rc.connect_.check() || rc.switch_.r == RC::DOWN);
 
-  if (!last_gimbal_connect && GMY.connect_.check()) {
+  if (!last_gimbal_connect && GMY.connect_.check() ||
+      last_rc_switch.r == RC::DOWN && rc.switch_.r != RC::DOWN) {
     gimbal_ctrl_ref_.init_flag = 1;
   } else {
     gimbal_ctrl_ref_.init_flag = 0;
@@ -184,6 +185,7 @@ void robotReset(void) {
   shoot_ctrl_ref_.fric_state = 1;
   shoot_ctrl_ref_.stir_reset = 1;
   gimbal_ctrl_ref_.mode = 0;
+  gimbal_ctrl_ref_.set_init_false = 0;
 }
 
 // 开机上电启动处理
@@ -193,20 +195,21 @@ bool robotStartup(void) {
   chassis_state = ChassisStateExt_e::RAW;
   shoot_ctrl_ref_.fric_state = 0;
   shoot_ctrl_ref_.stir_reset = 0;
-  gimbal_ctrl_ref_.init_flag = 1;
   if (STIR.init_state_ != Motor::Ready) {
     MotorInit(&STIR);
     //    flag = false;
   }
-  //  if (!gimbal.init_.j0_finish) {
-  //    chassis.lock_ = true;
-  //    flag = false;
-  //  } else {
-  //    chassis.lock_ = false;
-  //  }
-  //  if (!gimbal.init_.pitch_finish) {
-  //    flag = false;
-  //  }
+  if (!gimbal_ctrl_fdb_.yaw_init_finish) {
+    chassis_state = LOCK;
+    chassis_ctrl_ref_.mode_ = Lock;
+    flag = false;
+  } else {
+    chassis_ctrl_ref_.mode_ = Follow;
+    chassis_state = FOLLOW;
+  }
+  if (!gimbal_ctrl_fdb_.pitch_init_finish) {
+    flag = false;
+  }
   if (HAL_GetTick() < 1000) {
     flag = false;
   }
@@ -239,6 +242,7 @@ void robotControl(void) {
   // 重置一些冲激信号
   shoot_ctrl_ref_.shoot_CD = 0;
   shoot_ctrl_ref_.fric_state = 0;
+  gimbal_ctrl_ref_.set_init_false = 1;
 
   // 遥控器左上右上
   if (rc.switch_.l == RC::UP && rc.switch_.r == RC::UP) {

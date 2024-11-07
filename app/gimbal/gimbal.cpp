@@ -53,11 +53,9 @@ void Gimbal::init(void) {
   gm_pitch_->motor_data_.angle = math::degNormalize180(
       (gm_pitch_->motor_data_.ecd_angle - pitch_zero_ecd) / gm_pitch_->ratio_);
   gm_pitch_->resetFeedbackAngle(gm_pitch_->motor_data_.angle);
+  gimbal_fdb_send.pitch_init_finish = false;
+  gimbal_fdb_send.yaw_init_finish = false;
   now_tick = HAL_GetTick();
-  if ((now_tick - first_init_tick) > 3000) {
-    init_status_.yaw_finish = true;
-    init_status_.pitch_finish = true;
-  }
 }
 
 // Set gimbal angle and speed
@@ -119,13 +117,31 @@ void Gimbal::handle(void) {
     setMode(ENCODER_MODE);
   }
 
+  if (gimbal_cmd_rcv_.set_init_false == 1) {
+    init_status_.yaw_finish = false;
+    init_status_.pitch_finish = false;
+    gimbal_fdb_send.yaw_init_finish = init_status_.yaw_finish;
+    gimbal_fdb_send.pitch_init_finish = init_status_.pitch_finish;
+    first_init_tick = 0;
+  } else {
+    gimbal_fdb_send.yaw_init_finish = init_status_.yaw_finish;
+    gimbal_fdb_send.pitch_init_finish = init_status_.pitch_finish;
+  }
+
   if (gimbal_cmd_rcv_.init_flag == 1) {
     init();
   }
 
-  if (gimbal_cmd_rcv_.first_enter_flag == 1) {
-    setAngle(0, 0);
+  if (fabs(gm_yaw_->control_data_.fdb_angle) < 5 && first_init_tick != 0) {
+    init_status_.yaw_finish = gm_yaw_->connect_.check();
+    init_status_.pitch_finish = gm_pitch_->connect_.check();
+    gimbal_fdb_send.yaw_init_finish = init_status_.yaw_finish;
+    gimbal_fdb_send.pitch_init_finish = init_status_.pitch_finish;
   }
+
+  //  if (gimbal_cmd_rcv_.first_enter_flag == 1) {
+  //    setAngle(0, 0);
+  //  }
 
   addAngle(gimbal_cmd_rcv_.add_yaw, gimbal_cmd_rcv_.add_pitch);
 
@@ -157,9 +173,10 @@ void Gimbal::handle(void) {
   }
 
   // 云台电机离线处理
-  if (!gm_yaw_->connect_.check() && !gm_pitch_->connect_.check()) {
-    init();
-  }
+  //  if (!gm_yaw_->connect_.check() && !gm_pitch_->connect_.check() &&
+  //      HAL_GetTick() > 200) {
+  //    init();
+  //  }
 
   // 读取电机控制反馈
   fdb_.yaw = gm_yaw_->control_data_.fdb_angle;

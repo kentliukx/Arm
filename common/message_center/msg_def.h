@@ -88,13 +88,14 @@ typedef struct {
   uint8_t first_enter_flag;  // 1表示首次进入
   uint8_t mode;              // 0为imu, 1为encoder
   uint8_t init_flag;         // 0不激活初始化, 1激活
+  uint8_t set_init_false;
 } GimbalCtrlCmd;
 
 typedef struct {
   float gimbal_yaw_encoder;  // yaw轴角度
   float gimbal_yaw_zero;     // yaw编码器零点
-  uint8_t yaw_init_flag;
-  uint8_t pitch_init_flag;
+  bool yaw_init_finish;
+  bool pitch_init_finish;
 } GimbalFdbData;
 
 #endif  // RM_FRAME_MSG_DEF_H
