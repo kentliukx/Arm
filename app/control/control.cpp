@@ -260,19 +260,17 @@ void robotControl(void) {
   // 遥控器左上右中
   else if (rc.switch_.l == RC::UP && rc.switch_.r == RC::MID) {
     // 云台底盘测试
-    chassis_ctrl_ref_.mode_ = Follow;
-    chassis_state = FOLLOW;
     shoot_ctrl_ref_.fric_state = 1;
-    if (rc.channel_.dial_wheel < -100) {
+    if (rc.channel_.dial_wheel < -0.3) {
       // 开陀螺
-      if (rc.channel_.r_col > 300) {
+      if (rc.channel_.r_col > 0.5) {
         chassis_state = ChassisStateExt_e::TWIST;
         chassis_ctrl_ref_.mode_ = ChassisMode_e::Separate;
       } else {
         chassis_state = ChassisStateExt_e::GYRO;
         chassis_ctrl_ref_.mode_ = ChassisMode_e::Separate;
       }
-    } else if (rc.channel_.dial_wheel > 100) {
+    } else if (rc.channel_.dial_wheel > 0.3) {
       // 关陀螺
       chassis_state = ChassisStateExt_e::FOLLOW;
       chassis_ctrl_ref_.mode_ = ChassisMode_e::Follow;
