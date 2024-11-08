@@ -126,12 +126,14 @@ void controlLoop(void) {
   last_gimbal_connect = GMY.connect_.check();
 
   if (robot_state == STOP) {
+    gimbal_ctrl_ref_.if_robot_power_on = 0;
     allMotorsStopShutoff();
     robotReset();
   } else if (robot_state == STARTUP) {
     allMotorsOn();                  // 电机上电
     startup_flag = robotStartup();  // 开机状态判断
   } else if (robot_state == WORKING) {
+    gimbal_ctrl_ref_.if_robot_power_on = 1;
     allMotorsOn();   // 电机上电
     robotControl();  // 机器人控制
   }

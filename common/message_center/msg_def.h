@@ -89,6 +89,7 @@ typedef struct {
   uint8_t mode;              // 0为imu, 1为encoder
   uint8_t init_flag;         // 0不激活初始化, 1激活
   uint8_t set_init_false;
+  uint8_t if_robot_power_on;
 } GimbalCtrlCmd;
 
 typedef struct {

@@ -132,7 +132,8 @@ void Gimbal::handle(void) {
     init();
   }
 
-  if (fabs(gm_yaw_->control_data_.fdb_angle) < 5 && first_init_tick != 0) {
+  if (fabs(gm_yaw_->control_data_.fdb_angle) < 5 && first_init_tick != 0 &&
+      gimbal_cmd_rcv_.if_robot_power_on) {
     init_status_.yaw_finish = gm_yaw_->connect_.check();
     init_status_.pitch_finish = gm_pitch_->connect_.check();
     gimbal_fdb_send.yaw_init_finish = init_status_.yaw_finish;
