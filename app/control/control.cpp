@@ -289,7 +289,7 @@ void robotControl(void) {
       chassis_ctrl_ref_.vy = -rc.channel_.r_row * rcctrl::chassis_speed_rate;
       chassis_ctrl_ref_.wz = wz * chassis_gyro_dir;
     } else if (chassis_state == ChassisStateExt_e::TWIST) {
-      float wz = 480 * sin(HAL_GetTick() * 6e-3f);
+      float wz = 4.8 * sin(HAL_GetTick() * 6e-3f);
       chassis_ctrl_ref_.vx = rc.channel_.r_col * rcctrl::chassis_speed_rate;
       chassis_ctrl_ref_.vy = -rc.channel_.r_row * rcctrl::chassis_speed_rate;
       chassis_ctrl_ref_.wz = wz;
