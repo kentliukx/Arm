@@ -278,24 +278,24 @@ void robotControl(void) {
     }
 
     if (chassis_state == ChassisStateExt_e::FOLLOW) {
-      chassis_ctrl_ref_.vx = rc.channel_.r_col * rcctrl::chassis_speed_rate;
-      chassis_ctrl_ref_.vy = -rc.channel_.r_row * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.vx = -rc.channel_.r_col * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.vy = rc.channel_.r_row * rcctrl::chassis_speed_rate;
       chassis_ctrl_ref_.wz = 0;
     } else if (chassis_state == ChassisStateExt_e::GYRO) {
       float dice = sinf(HAL_GetTick() / 100.f);
       float wz = 1.5;
       if (dice >= 0) wz = 3;
-      chassis_ctrl_ref_.vx = rc.channel_.r_col * rcctrl::chassis_speed_rate;
-      chassis_ctrl_ref_.vy = -rc.channel_.r_row * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.vx = -rc.channel_.r_col * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.vy = rc.channel_.r_row * rcctrl::chassis_speed_rate;
       chassis_ctrl_ref_.wz = wz * chassis_gyro_dir;
     } else if (chassis_state == ChassisStateExt_e::TWIST) {
       float wz = 4.8 * sin(HAL_GetTick() * 6e-3f);
-      chassis_ctrl_ref_.vx = rc.channel_.r_col * rcctrl::chassis_speed_rate;
-      chassis_ctrl_ref_.vy = -rc.channel_.r_row * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.vx = -rc.channel_.r_col * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.vy = rc.channel_.r_row * rcctrl::chassis_speed_rate;
       chassis_ctrl_ref_.wz = wz;
     } else if (chassis_state == ChassisStateExt_e::RAW) {
-      chassis_ctrl_ref_.vx = rc.channel_.r_col * rcctrl::chassis_speed_rate;
-      chassis_ctrl_ref_.vy = -rc.channel_.r_row * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.vx = -rc.channel_.r_col * rcctrl::chassis_speed_rate;
+      chassis_ctrl_ref_.vy = rc.channel_.r_row * rcctrl::chassis_speed_rate;
       chassis_ctrl_ref_.wz = -rc.channel_.l_row * rcctrl::gimbal_rate;
     }
 
