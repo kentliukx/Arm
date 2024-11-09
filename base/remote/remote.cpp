@@ -32,8 +32,8 @@ void RC::init(void) {
   rx_len_ = 0;
   reset();
   if (huart_ != nullptr) {
-    //__HAL_UART_ENABLE_IT(huart_, UART_IT_IDLE);
-    HAL_UARTEx_ReceiveToIdle_DMA(huart_, rx_buf_, 24);
+    __HAL_UART_ENABLE_IT(huart_, UART_IT_IDLE);
+    HAL_UART_Receive_DMA(huart_, rx_buf_, 1);
   }
 }
 
@@ -84,11 +84,18 @@ void RC::handle(void) {
   key_ = rx_data_[14] | rx_data_[15] << 8;           // Keyboard
   rc_raw_.ch[4] = rx_data_[16] | rx_data_[17] << 8;  // Dial wheel
 
-  channel_.r_row = rc_raw_.ch[0] - rc_ch_offset;
-  channel_.r_col = rc_raw_.ch[1] - rc_ch_offset;
-  channel_.l_row = rc_raw_.ch[2] - rc_ch_offset;
-  channel_.l_col = rc_raw_.ch[3] - rc_ch_offset;
-  channel_.dial_wheel = rc_raw_.ch[4] - rc_ch_offset;
+  int16_t r_row = rc_raw_.ch[0] - rc_ch_offset;
+  int16_t r_col = rc_raw_.ch[1] - rc_ch_offset;
+  int16_t l_row = rc_raw_.ch[2] - rc_ch_offset;
+  int16_t l_col = rc_raw_.ch[3] - rc_ch_offset;
+  int16_t dial_wheel = rc_raw_.ch[4] - rc_ch_offset;
+
+  channel_.r_row = math::interval_mapping(-660, 660, -1, 1, r_row);
+  channel_.l_row = math::interval_mapping(-660, 660, -1, 1, l_row);
+  channel_.r_col = math::interval_mapping(-660, 660, -1, 1, r_col);
+  channel_.l_col = math::interval_mapping(-660, 660, -1, 1, l_col);
+  channel_.dial_wheel = math::interval_mapping(-660, 660, -1, 1, dial_wheel);
+
   if (rc_raw_.s[0] == 1) {
     switch_.r = UP;
   } else if (rc_raw_.s[0] == 2) {
@@ -108,10 +115,9 @@ void RC::handle(void) {
 // Update connect status, restart UART(SBUS) receive.
 // 更新连接状态，重新打开UART(SBUS)接收
 void RC::rxCallback(void) {
-  connect_.refresh();
-  memcpy(rx_data_, rx_buf_, RC_FRAME_LEN);
+  rx_len_++;
   if (huart_ != nullptr) {
-    HAL_UARTEx_ReceiveToIdle_DMA(huart_, rx_buf_, 24);
+    HAL_UART_Receive_DMA(huart_, rx_buf_ + rx_len_, 1);
   }
 }
 

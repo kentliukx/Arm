@@ -15,10 +15,9 @@
 extern "C" {
 #endif
 
-#define ENGINEER_A
-#ifndef ENGINEER_A
-    #define ENGINEER_B
-#endif
+#define mecanum_chassis
+// #define swerve_chassis
+#define infantry_shoot
 
 // 开发板型号
 #define DBA
@@ -26,7 +25,7 @@ extern "C" {
 // 遥控器串口
 #define RC_UART &huart1
 // 视觉通信串口
-//#define CV_UART &huart3
+// #define CV_UART &huart3
 // 距离传感器串口
 #define DIS_UART &huart7
 // 裁判系统通信串口
@@ -34,7 +33,7 @@ extern "C" {
 // 自定义控制器通信串口
 #define CONTROLLER_UART &huart6
 // 舵机串口
-//#define SERVO_UART &huart7
+// #define SERVO_UART &huart7
 // 调试串口
 // #define DEBUG_UART &huart8
 #define DEBUG_USB

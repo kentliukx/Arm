@@ -51,10 +51,10 @@ class RefereeComm {
   // undefined dart_status, 0x0004
   // 人工智能挑战赛加成/惩罚区分布与潜伏模式状态
   ext_ICRA_buff_debuff_zone_and_lurk_status_t icra_status_;
-  ext_event_data_t event_data_;  // 场地事件数据
+  ext_event_data_t event_data_;                              // 场地事件数据
   ext_supply_projectile_action_t supply_projectile_action_;  // 补给站动作标识
-  ext_referee_warning_t referee_warning_;          // 裁判警告信息
-  ext_dart_remaining_time_t dart_remaining_time_;  // 飞镖发射口倒计时
+  ext_referee_warning_t referee_warning_;                    // 裁判警告信息
+  ext_dart_remaining_time_t dart_remaining_time_;            // 飞镖发射口倒计时
 
   ext_game_robot_status_t game_robot_status_;      // 比赛机器人状态
   ext_power_heat_data_t power_heat_data_;          // 实时功率热量数据
@@ -65,7 +65,7 @@ class RefereeComm {
   ext_shoot_data_t shoot_data_;                    // 实时射击信息
   ext_bullet_remaining_t bullet_remaining_;        // 子弹剩余发射数
   ext_rfid_status_t rfid_status_;                  // 机器人RFID状态
-  ext_dart_client_cmd_t dart_client_cmd_;  // 客户端飞镖指令数据
+  ext_dart_client_cmd_t dart_client_cmd_;          // 客户端飞镖指令数据
 
   // todo: interactive data(class)
 
@@ -73,6 +73,8 @@ class RefereeComm {
   UART_HandleTypeDef* huart_;
 
   Publisher_t* referee_cv_pub_;
+  Publisher_t* referee_shoot_pub_;
+  RefereeShootFdb referee_shoot_data;
 
   struct Tx_t {
     uint8_t buf[REFEREE_TX_BUF_SIZE];

@@ -9,9 +9,10 @@
  ******************************************************************************
  */
 
+#include "motor.h"
+
 #include "algorithm/math/math.h"
 #include "base/motor/motor_driver/mit_motor_driver.h"
-#include "motor.h"
 #include "string.h"
 
 namespace motor {
@@ -30,7 +31,8 @@ const float kf_x0[2] = {0, 0};
 // Motor构造函数:
 Motor::Motor(const Type_e& type, const float& ratio,
              const ControlMethod_e& method, const PID& ppid, const PID& spid,
-             bool use_kf, const KFParam_t& kf_param,
+             const InitMode_e& init_mode, const float& offset, bool use_kf,
+             const KFParam_t& kf_param,
              float (*model)(const float&, const float&))
     : connect_(motor::connect_timeout),
       ratio_(ratio),
@@ -39,6 +41,8 @@ Motor::Motor(const Type_e& type, const float& ratio,
       spid_(spid),
       model_(model),
       use_kf_(use_kf),
+      init_mode_(init_mode),
+      offset_(offset),
       kf_(2, 1, 1, motor::kf_F, motor::kf_B, motor::kf_H, kf_param.Q,
           kf_param.R, motor::kf_x0) {
   info_.type = type;
@@ -47,14 +51,18 @@ Motor::Motor(const Type_e& type, const float& ratio,
   // 设定控制信号最大范围
   if (info_.type == Motor::M3508) {
     info_.max_intensity = 16384;
+    info_.max_torque = 16384 * 1.90702994e-5f;
   } else if (info_.type == Motor::M2006) {
     info_.max_intensity = 10000;
+    info_.max_torque = 10000 * 0.00018f;
   } else if (info_.type == Motor::GM6020) {
     info_.max_intensity = 30000;
+    info_.max_torque = 30000 * 5.880969e-5f;
   } else if (info_.type == Motor::MIT) {
     info_.max_intensity = 40;
   } else if (info_.type == Motor::LK_MG4005) {
     info_.max_intensity = 2000;
+    info_.max_torque = 2.5;
   }
   mode_ = INIT;
   setFdbSrc(nullptr, nullptr);

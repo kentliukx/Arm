@@ -111,3 +111,11 @@ float math::degNormalize180(const float& angle) {
 }
 
 bool math::float_equal(float x, float y) { return (std::abs(x - y) < 0.001f); }
+
+float math::interval_mapping(float fdb_x, float fdb_y, float ref_x, float ref_y,
+                             float x) {
+  float len1 = fdb_y - fdb_x;
+  float len2 = ref_y - ref_x;
+  float delta = x - fdb_x;
+  return (delta * (len2 / len1) + ref_x);
+}

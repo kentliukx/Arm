@@ -18,6 +18,11 @@ extern "C" {
 // 开发板型号
 #define DBC
 
+// #define swerve_chassis
+// #define mecanum_chassis
+#define infantry_shoot
+// #define hero_shoot
+
 // 遥控器串口
 #define RC_UART &huart3
 // 视觉通信串口

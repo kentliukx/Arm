@@ -43,6 +43,19 @@ class Motor {
     WORKING,   // 工作
   } Mode_e;
 
+  typedef enum InitMode {
+    None,  // 不需要初始化
+    Hit,   // 撞限位初始化
+  } InitMode_e;
+
+  typedef enum HitInitState {
+    Prepare,
+    ReverseRotation,
+    Block,
+    Init,
+    Ready,
+  } HitInitState_e;
+
   // motor kalman filter parameters(Q & R)
   typedef struct KFParam {
     KFParam(const float& Q11, const float& Q22, const float& R11,
@@ -63,7 +76,8 @@ class Motor {
 
  public:
   Motor(const Type_e& type, const float& ratio, const ControlMethod_e& method,
-        const PID& ppid, const PID& spid, bool use_kf = false,
+        const PID& ppid, const PID& spid, const InitMode_e& init_mode = None,
+        const float& offset = 0, bool use_kf = false,
         const KFParam_t& kf_param = KFParam_t(2, 1e4, 1, 0.75, 50),
         float (*model)(const float&, const float&) = nullptr);
 
@@ -126,12 +140,17 @@ class Motor {
     uint8_t can_channel;  // CAN通道1/2
     uint8_t id;           // id
     float max_intensity;  // 控制信号限幅
+    float max_torque;     // 最大输出力矩，用于判断堵转
   } info_;
 
   Connect connect_;
   Motor::Mode_e mode_;
   Motor::ControlMethod_e method_;
+  Motor::InitMode_e init_mode_;
   float ratio_;  // 减速比
+  float offset_ = 0;
+  HitInitState_e init_state_ = Prepare;
+  uint64_t init_tick_;
 
   // control value 输出控制量
   float intensity_float_;  // (N.m)

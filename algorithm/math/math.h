@@ -53,6 +53,10 @@ float degNormalize180(const float& angle);
 // 判断浮点数相等
 bool float_equal(float x, float y);
 
+// 区间映射压缩 注意y大于x
+float interval_mapping(float fdb_x, float fdb_y, float ref_x, float ref_y,
+                       float x);
+
 }  // namespace math
 
 #endif  // MATH_H

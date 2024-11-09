@@ -4,9 +4,20 @@
 
 #include "MecanumChassis.h"
 
-MecanumChassis::MecanumChassis() {
-  chassis_pub_ = PubRegister("chassis_cmd", sizeof(ChassisCtrlCmd));
-  chassis_sub_ = SubRegister("chassis_fdb", sizeof(ChassisCtrlCmd));
+MecanumChassis::MecanumChassis(Motor* cmfl, Motor* cmfr, Motor* cmbl,
+                               Motor* cmbr, PID angle_pid,
+                               LowPassFilter speed_filter)
+    : cmfl_(cmfl),
+      cmfr_(cmfr),
+      cmbl_(cmbl),
+      cmbr_(cmbr),
+      angle_pid_(angle_pid),
+      vx_filter_(speed_filter),
+      vy_filter_(speed_filter) {
+  mode_ = Lock;
+  chassis_lock = true;
+  chassis_pub_ = PubRegister("chassis_fdb", sizeof(ChassisCtrlCmd));
+  chassis_sub_ = SubRegister("chassis_cmd", sizeof(ChassisCtrlCmd));
 }
 
 void MecanumChassis::ikine(void) {
@@ -21,8 +32,7 @@ void MecanumChassis::ikine(void) {
   // 底盘坐标系目标状态->电机转速
   float vx = chassis_ref_spd_.vx;
   float vy = chassis_ref_spd_.vy;
-  float wv = math::dps2radps(chassis_ref_spd_.wz) *
-             (half_track_width + half_wheel_base);
+  float wv = chassis_ref_spd_.wz * (half_track_width + half_wheel_base);
   wheel_ref_.fl = math::radps2dps((-wv + vx - vy) / wheel_radius);
   wheel_ref_.fr = math::radps2dps((-wv - vx - vy) / wheel_radius);
   wheel_ref_.bl = math::radps2dps((-wv + vx + vy) / wheel_radius);
@@ -39,8 +49,9 @@ void MecanumChassis::fkine(void) {
       0.25f * math::dps2radps(rv_fl - rv_fr + rv_bl - rv_br) * wheel_radius;
   chassis_fdb_spd_.vy =
       0.25f * math::dps2radps(-rv_fl - rv_fr + rv_bl + rv_br) * wheel_radius;
-  chassis_fdb_spd_.wz = 0.25f * (-rv_fl - rv_fr - rv_bl - rv_br) *
-                        wheel_radius / (half_track_width + half_wheel_base);
+  chassis_fdb_spd_.wz =
+      math::dps2radps(0.25f * (-rv_fl - rv_fr - rv_bl - rv_br) * wheel_radius /
+                      (half_track_width + half_wheel_base));
   chassis_fdb_spd_.angle = chassis_fdb_spd_.angle + chassis_fdb_spd_.wz * 1e-3f;
   // 底盘坐标系反馈状态->机器人坐标系反馈状态
   fdb_spd.vx =
@@ -59,8 +70,19 @@ void MecanumChassis::fkine(void) {
 void MecanumChassis::handle(void) {
   // 获取控制数据
   SubGetMessage(chassis_sub_, &chassis_cmd_rcv_);
+
+  // Follow模式旋转速度计算
+  fdb_spd.angle = chassis_cmd_rcv_.fdb_angle;
+  if (chassis_cmd_rcv_.mode_ == ChassisMode_e::Follow) {
+    chassis_cmd_rcv_.wz =
+        -math::deadBand(angle_pid_.calc(chassis_cmd_rcv_.ref_angle,
+                                        chassis_cmd_rcv_.follow_fdb_angle),
+                        -5 / 58.f, 5 / 58.f);
+  }
+
+  // 目标速度设置
   SetSpeed(chassis_cmd_rcv_.vx, chassis_cmd_rcv_.vy, chassis_cmd_rcv_.wz);
-  SetAngle(chassis_cmd_rcv_.ref_angle);
+  //  SetAngle(chassis_cmd_rcv_.ref_angle);
   if (mode_ != chassis_cmd_rcv_.mode_) {
     LOGINFO("Set chassis mode from %d to %d", mode_, chassis_cmd_rcv_.mode_);
     mode_ = chassis_cmd_rcv_.mode_;

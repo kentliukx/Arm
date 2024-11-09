@@ -16,23 +16,93 @@
 // Motor parameter config
 // 电机参数配置
 
-// 底盘电机
-const PID chassis_wheel_spid(40, 4, 10, 4000, 16384);
-Motor CMFL(Motor::M3508, 3591.f / 187.f, Motor::SPEED,  // type, ratio, method
-           PID(), PID(chassis_wheel_spid));             // ppid, spid
-Motor CMFR(Motor::M3508, 3591.f / 187.f, Motor::SPEED,  // type, ratio, method
-           PID(), PID(chassis_wheel_spid));             // ppid, spid
-Motor CMBL(Motor::M3508, 3591.f / 187.f, Motor::SPEED,  // type, ratio, method
-           PID(), PID(chassis_wheel_spid));             // ppid, spid
-Motor CMBR(Motor::M3508, 3591.f / 187.f, Motor::SPEED,  // type, ratio, method
-           PID(), PID(chassis_wheel_spid));             // ppid, spid
+// Chassis motor 底盘电机
+const PID chassis_wheel_spid(10, 0, 0, 0, 16384);
+const float CHASSIS_MOTOR_RATIO = -13.9f;
+Motor CMFL(Motor::M3508, CHASSIS_MOTOR_RATIO,
+           Motor::SPEED,                     // type, ratio, method
+           PID(), PID(chassis_wheel_spid));  // ppid, spid
+Motor CMFR(Motor::M3508, CHASSIS_MOTOR_RATIO,
+           Motor::SPEED,                     // type, ratio, method
+           PID(), PID(chassis_wheel_spid));  // ppid, spid
+Motor CMBL(Motor::M3508, CHASSIS_MOTOR_RATIO,
+           Motor::SPEED,                     // type, ratio, method
+           PID(), PID(chassis_wheel_spid));  // ppid, spid
+Motor CMBR(Motor::M3508, CHASSIS_MOTOR_RATIO,
+           Motor::SPEED,                     // type, ratio, method
+           PID(), PID(chassis_wheel_spid));  // ppid, spid
 
+// 航向电机
+const float steering_motor_ratio = -1.0f;
+const PID STEERING_POSITION_PID(30, 6, 150, 22, 1000);
+const PID STEERING_SPEED_PID(30, 5, 0, 10, 30000);
+Motor STFL(Motor::GM6020, steering_motor_ratio, Motor::POSITION_SPEED,
+           PID(STEERING_POSITION_PID), PID(STEERING_SPEED_PID));
+Motor STFR(Motor::GM6020, steering_motor_ratio, Motor::POSITION_SPEED,
+           PID(STEERING_POSITION_PID), PID(STEERING_SPEED_PID));
+Motor STBL(Motor::GM6020, steering_motor_ratio, Motor::POSITION_SPEED,
+           PID(STEERING_POSITION_PID), PID(STEERING_SPEED_PID));
+Motor STBR(Motor::GM6020, steering_motor_ratio, Motor::POSITION_SPEED,
+           PID(STEERING_POSITION_PID), PID(STEERING_SPEED_PID));
+
+// 摩擦轮电机
+const PID fric_spid(4, 0, 15, 0, 16384);
+
+Motor FRICL(Motor::M3508, 1, Motor::SPEED,  // type, ratio, method
+            PID(), PID(fric_spid));         // ppid, spid
+Motor FRICR(Motor::M3508, 1, Motor::SPEED,  // type, ratio, method
+            PID(), PID(fric_spid));         // ppid, spid
+
+// 拨盘电机
+Motor STIR(Motor::M2006, -36, Motor::POSITION_SPEED,  // type, ratio, method
+           PID(20, 0.1, 10, 10, 2500),                // ppid
+           PID(60, 0.1, 0, 1000, 10000), Motor::Hit, -2);  // spid
+
+// Gimbal motor 云台电机
+Motor GMY(Motor::GM6020, -1, Motor::POSITION_SPEED,  // type, ratio, method
+          PID(8, 0, 0, 15, 600),                     // ppid
+          PID(300, 2, 0, 500, 30000),                // spid
+          Motor::None, 0, true);                     // use kf
+Motor GMP(Motor::GM6020, 1, Motor::POSITION_SPEED,   // type, ratio, method
+          PID(80, 0, 2000, 15, 1800),                // ppid
+          PID(500, 0, 0, 500, 30000),                // spid
+          Motor::None, 0, true);                     // use kf
+
+// 上板
+// Motor* can1_dji_motor[11] = {
+//    &CMFL,    // id:1
+//    &CMBL,    // id:2
+//    nullptr,  // id:3
+//    nullptr,  // id:4
+//    &STFL,    // id:5
+//    &STBL,    // id:6
+//    nullptr,  // id:7
+//    nullptr,  // id:8
+//    nullptr,  // id:9
+//    nullptr,  // id:10
+//    nullptr   // id:11
+//};
+// Motor* can2_dji_motor[11] = {
+//    &CMFR,    // id:1
+//    &CMBR,    // id:2
+//    nullptr,  // id:3
+//    nullptr,  // id:4
+//    &STFR,    // id:5
+//    &STBR,    // id:6
+//    nullptr,  // id:7
+//    nullptr,  // id:8
+//    nullptr,  // id:9
+//    nullptr,  // id:10
+//    nullptr   // id:11
+//};
+
+// 下板
 Motor* can1_dji_motor[11] = {
-    &CMFL,    // id:1
-    &CMFR,    // id:2
-    &CMBL,    // id:3
-    &CMBR,    // id:4
-    nullptr,  // id:5
+    &FRICR,   // id:1
+    nullptr,  // id:2
+    &FRICL,   // id:3
+    nullptr,  // id:4
+    &GMP,     // id:5
     nullptr,  // id:6
     nullptr,  // id:7
     nullptr,  // id:8
@@ -42,13 +112,13 @@ Motor* can1_dji_motor[11] = {
 };
 Motor* can2_dji_motor[11] = {
     nullptr,  // id:1
-    nullptr,  // id:2
-    nullptr,  // id:3
+    &STIR,    // id:2
+    &CMBL,    // id:3
     nullptr,  // id:4
-    nullptr,  // id:5
-    nullptr,  // id:6
-    nullptr,  // id:7
-    nullptr,  // id:8
+    &CMFL,    // id:5
+    &CMFR,    // id:6
+    &GMY,     // id:7
+    &CMBR,    // id:8
     nullptr,  // id:9
     nullptr,  // id:10
     nullptr   // id:11

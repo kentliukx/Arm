@@ -12,6 +12,7 @@
 #include "referee_comm.h"
 // #include "app/shoot.h"
 #include "algorithm/crc/crc.h"
+#include "hardware_config.h"
 #include "referee_ui.h"
 
 // extern Shoot shoot;
@@ -24,6 +25,7 @@ RefereeComm::RefereeComm(UART_HandleTypeDef* huart)
 // Init UART receive 初始化，打开UART接收
 void RefereeComm::init(void) {
   referee_cv_pub_ = PubRegister("referee_cv", sizeof(RefereeCVData));
+  referee_shoot_pub_ = PubRegister("referee_shoot", sizeof(RefereeShootFdb));
   if (huart_ != nullptr) {
     HAL_UART_Receive_IT(huart_, rx_.byte, 1);
   }
@@ -31,7 +33,8 @@ void RefereeComm::init(void) {
 
 // Handle data, check connection 处理数据，检查连接状态
 void RefereeComm::handle(void) {
-  connect_.check();
+  referee_shoot_data.if_connect = connect_.check();
+  PubPushMessage(referee_shoot_pub_, &referee_shoot_data);
   // txMsg();
 }
 
@@ -44,6 +47,9 @@ void RefereeComm::txMsg(void) {
 
 // Data receive callback 接收中断
 void RefereeComm::rxCallback(void) {
+  // 重置new_bullet信号
+  referee_shoot_data.new_bullet = 0;
+
   // 将接收到的1byte数据存入fifo缓冲区
   rx_.fifo.append(rx_.byte, 1);
 
@@ -186,8 +192,7 @@ void RefereeComm::rxCallback(void) {
       memcpy(&robot_hurt_, rx_.buf + data_offset, rx_.frame.header.data_len);
     } else if (rx_.frame.cmd_id == SHOOT_DATA_ID) {
       memcpy(&shoot_data_, rx_.buf + data_offset, rx_.frame.header.data_len);
-      // todo
-      // shoot.new_bullet();
+      referee_shoot_data.new_bullet = 1;
 
     } else if (rx_.frame.cmd_id == BULLET_REMAINING_ID) {
       memcpy(&bullet_remaining_, rx_.buf + data_offset,
@@ -211,6 +216,18 @@ void RefereeComm::rxCallback(void) {
     referee_cv_data.game_robot_pos_x = game_robot_pos_.x;
     referee_cv_data.game_robot_pos_y = game_robot_pos_.y;
     PubPushMessage(referee_cv_pub_, &referee_cv_data);
+
+    // 发射机构信息填写
+    referee_shoot_data.bullet_speed = shoot_data_.bullet_speed;
+#ifdef infantry_shoot
+    referee_shoot_data.cooling_heat =
+        power_heat_data_.shooter_id1_17mm_cooling_heat;
+#elif defined(hero_shoot)
+    referee_shoot_data.cooling_heat =
+        power_heat_data_.shooter_id1_42mm_cooling_heat;
+#endif
+    referee_shoot_data.cooling_rate = game_robot_status_.shooter_cooling_rate;
+    referee_shoot_data.cooling_limit = game_robot_status_.shooter_cooling_limit;
 
     // 刷新连接状态
     if (unpack_error_ == NO_ERROR) {

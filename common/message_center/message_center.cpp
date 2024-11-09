@@ -10,7 +10,7 @@ static Publisher_t message_center = {.topic_name = "Message_Manager",
                                      .first_subs = NULL,
                                      .next_topic_node = NULL};
 
-static void CheckName(char* name) {
+static void CheckName(const char* name) {
   if (strlen(name) >= MAX_TOPIC_NAME_LEN) {
     //        LOGERROR("EVENT NAME TOO LONG:%s", name);
     while (1)
@@ -26,7 +26,7 @@ static void CheckLen(uint8_t len1, uint8_t len2) {
   }
 }
 
-Publisher_t* PubRegister(char* name, uint8_t data_len) {
+Publisher_t* PubRegister(const char* name, uint8_t data_len) {
   CheckName(name);
   Publisher_t* node = &message_center;
   while (
@@ -50,7 +50,7 @@ Publisher_t* PubRegister(char* name, uint8_t data_len) {
   return node->next_topic_node;
 }
 
-Subscriber_t* SubRegister(char* name, uint8_t data_len) {
+Subscriber_t* SubRegister(const char* name, uint8_t data_len) {
   Publisher_t* pub = PubRegister(name, data_len);  // 查找或创建该话题的发布者
   // 创建新的订阅者结点,申请内存,注意要memset因为新空间不一定是空的,可能有之前留存的垃圾值
   Subscriber_t* ret = (Subscriber_t*)malloc(sizeof(Subscriber_t));

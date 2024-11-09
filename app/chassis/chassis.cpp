@@ -18,5 +18,4 @@ void Chassis::SetSpeed(float vx_, float vy_, float wz_) {
   SetWz(wz_);
 }
 
-void Chassis::SetAngle(float angle_) { ref_spd.angle = angle_;
-}
+void Chassis::SetAngle(float angle_) { ref_spd.angle = angle_; }
