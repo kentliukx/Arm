@@ -21,6 +21,7 @@
 #include "cv_comm.h"
 
 #include "cmsis_os.h"
+#include "common/log/bsp_log.h"
 
 CVComm::CVComm(UART_HandleTypeDef* huart)
     : huart_(huart),
@@ -34,7 +35,7 @@ CVComm::CVComm(UART_HandleTypeDef* huart)
 void CVComm::init(void) {
   gimbal_upload_sub_ = SubRegister("gimbal_upload", sizeof(GimbalUploadData));
   shoot_upload_sub_ = SubRegister("shoot_upload", sizeof(ShootUploadData));
-  gimbal_cmd_pub_ = PubRegister("gimbal_cmd", sizeof(GimbalCtrlCmdCV));
+  gimbal_cmd_pub_ = PubRegister("gimbal_cmd_cv", sizeof(GimbalCtrlCmdCV));
   shoot_cmd_pub_ = PubRegister("shoot_cmd_cv", sizeof(ShootCtrlCmdCV));
   referee_cv_sub_ = SubRegister("referee_cv", sizeof(RefereeCVData));
 
@@ -55,13 +56,13 @@ void CVComm::txHandle(uint32_t* tick) {
   // CV
   cvcomm::MsgStream_e stream = cvcomm::MsgStream::BOARD2PC;
   general_board2pc_msg_.mode = (uint8_t)mode_;
-  txMsg(stream, cvcomm::MsgType::GENERAL, general_pc2board_msg_);
+  txMsg(stream, cvcomm::MsgType::GENERAL, general_board2pc_msg_);
   osDelayUntil(tick, 5);  // 自瞄/打符/反符
 
   static const auto update_aimshoot_msg = [&]() {
-    static GimbalUploadData gimbal_upload_data_;
-    static ShootUploadData shoot_upload_data_;
-    static RefereeCVData referee_cv_data_;
+    static GimbalUploadData gimbal_upload_data_ = {};
+    static ShootUploadData shoot_upload_data_ = {};
+    static RefereeCVData referee_cv_data_ = {};
     SubGetMessage(gimbal_upload_sub_, &gimbal_upload_data_);
     SubGetMessage(shoot_upload_sub_, &shoot_upload_data_);
     SubGetMessage(referee_cv_sub_, &referee_cv_data_);
@@ -162,8 +163,10 @@ void CVComm::txMsg(cvcomm::MsgStream_e msg_stream, cvcomm::MsgType_e msg_type,
   tx_.pack_size += sizeof(tx_.frame.crc16);
   CRC16_Append(tx_.buf, tx_.pack_size);
 
+  state_ = 3;
   // UART transmit
   if (huart_ != nullptr) {
+    state_ = 4;
     HAL_UART_Transmit_IT(huart_, tx_.buf, tx_.pack_size);
   }
 }

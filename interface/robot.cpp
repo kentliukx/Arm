@@ -104,13 +104,13 @@ void imuTask(void const* argument) {
   }
 }
 
-osThreadId cvCommTaskHandle;
-void cvCommTask(void const* argument) {
+osThreadId minipcCommTaskHandle;
+void minipcCommTask(void const* argument) {
   uint32_t tick = osKernelSysTick();
   cv_comm.init();
   for (;;) {
     cv_comm.txHandle(&tick);
-    osDelay(1);
+    //    osDelay(1);
   }
 }
 
@@ -151,8 +151,8 @@ void rtosTaskInit(void) {
   osThreadDef(imu_task, imuTask, osPriorityRealtime, 0, 128);
   imuTaskHandle = osThreadCreate(osThread(imu_task), NULL);
 
-  //  osThreadDef(minipc_comm_task, minipcCommTask, osPriorityNormal, 0, 512);
-  //  minipcCommTaskHandle = osThreadCreate(osThread(minipc_comm_task), NULL);
+  osThreadDef(minipc_comm_task, minipcCommTask, osPriorityNormal, 0, 512);
+  minipcCommTaskHandle = osThreadCreate(osThread(minipc_comm_task), NULL);
 
   osThreadDef(referee_comm_task, refereeCommTask, osPriorityNormal, 0, 512);
   refereeCommTaskHandle = osThreadCreate(osThread(referee_comm_task), NULL);
