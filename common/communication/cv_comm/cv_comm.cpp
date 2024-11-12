@@ -163,10 +163,8 @@ void CVComm::txMsg(cvcomm::MsgStream_e msg_stream, cvcomm::MsgType_e msg_type,
   tx_.pack_size += sizeof(tx_.frame.crc16);
   CRC16_Append(tx_.buf, tx_.pack_size);
 
-  state_ = 3;
   // UART transmit
   if (huart_ != nullptr) {
-    state_ = 4;
     HAL_UART_Transmit_IT(huart_, tx_.buf, tx_.pack_size);
   }
 }
