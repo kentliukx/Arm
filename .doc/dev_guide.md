@@ -8,7 +8,9 @@
 
 - **软件安装**
 
-本框架所用到的一些开发工具的下载方式，我们提供了网盘的资源。所有安装包也可以在交大网盘链接下获得：[archive.zip](https://pan.sjtu.edu.cn/web/share/103c2e95cbcf49e488d7fa8dc7d17e39)
+本框架所用到的一些开发工具的下载方式，我们提供了网盘的资源。所有安装包也可以在交大网盘链接下获得：[archive](分享内容:
+archive
+https://pan.sjtu.edu.cn/web/share/081fcff2d943b41b0c33437e68c3623d)
 
 ```shell
 # 网盘中的文件:
@@ -84,10 +86,6 @@ Ozone_Windows_V326f_x64.exe  # Ozone安装包
 
 ## Ozone可视化调试和LOG功能
 
-> ~~Ozone暂时只支持jlink。~~
->
-> 22/11/16**重要更新**：安装Ozone3.24 32-bit和J-Link7.22b目前可以支持Jlink和**dap-link（包括ATK无线调试器）**
-
 ### 软件安装
 
 安装Ozone和J-link工具箱（驱动、gdb以及各种调试工具）。安装包都在网盘里。
@@ -131,6 +129,8 @@ CMSIS-dap。选择你要使用的调试器，然后继续。
 
 选择构建之后生成的.elf文件（在项目文件夹下的build中）。这是调试器专用的文件格式，对其内容感兴趣可以自行搜索细节。此外ozone还支持.bin
 .hex .axf（最后一个是amr-cc，也就是keil的工具链会生成的）等格式。
+
+> **如果你使用的是axf,Initial PC(after download and reset)选择“Read from Base Address Vector Table”**
 
 ![image-20221113134605331](./.assets/image-20221113134605331.png)
 
