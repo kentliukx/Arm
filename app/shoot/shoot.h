@@ -12,18 +12,41 @@
 #include "common/message_center/msg_def.h"
 #include "hardware_config.h"
 
-#ifdef infantry_shoot
-#include "common/heat_limit/heat_limit_infantry.h"
-#endif
+class HeatLimit {
+ public:
+  HeatLimit(float heat_limit, float cooling_rate)
+      : heat_limit_(heat_limit),
+        cooling_rate_(cooling_rate),
+        heat_state_(true),
+        calc_heat_(0) {}
+  
+  float heat_limit_;
+  float calc_heat_;
+  bool heat_state_;
+  float cooling_rate_;
+  const float bullet_heat = 10;  // 单发热量
+
+  // 热量处理(裁判系统通信热量实时性不够，需自行计算保证不超热量)
+  void HeatHandle(void) {
+    calc_heat_ = math::limitMin(calc_heat_ - cooling_rate_ * 1e-3f, 0);
+    // 判断下一发是否会超热量
+    if (heat_limit_ - calc_heat_ > bullet_heat + 10.0f) {
+      heat_state_ = true;
+    } else {
+      heat_state_ = false;
+    }
+  };
+};
 
 class Shoot {
  public:
   Shoot(Motor* fric_l, Motor* fric_r, Motor* stir);
-
-  // 发射一发弹丸(发射-true，未发射-false)
-  bool ShootOneBullet(void);
   // 发射数据处理
   void handle(void);
+
+ protected:
+  // 发射一发弹丸(发射-true，未发射-false)
+  bool ShootOneBullet(void);
   // 设置射击参数
   void SetShootParam(const float& speed_limit, const float& heat_limit,
                      const float& cooling_rate);
@@ -49,7 +72,6 @@ class Shoot {
     stir_->control_data_.target_angle = stir_->control_data_.fdb_angle;
   }
 
- protected:
   // 射速处理
   void SpeedHandle(void);
   // 卡弹处理
@@ -81,9 +103,7 @@ class Shoot {
   bool fric_state_;   // 摩擦轮状态，true-开启，false-停止
   bool block_state_;  // 卡弹状态，true-卡弹，false-未卡弹
 
-#ifdef infantry_shoot
-  HeatLimitInfantry heat_control_;
-#endif
+  HeatLimit heat_control_;
 
   float speed_limit_;  // 射速上限
 
