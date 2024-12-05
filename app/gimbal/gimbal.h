@@ -71,7 +71,7 @@ class Gimbal {
   Motor *gm_yaw_, *gm_pitch_;  // 电机指针
   IMU* imu_;                   // imu指针
 
-  uint32_t now_tick;
+  uint32_t now_tick = 0;
 
   // 反馈发布者
   Publisher_t* gimbal_pub_;

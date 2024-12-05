@@ -28,5 +28,7 @@ void robotCmdInit(void);
 void robotCmdSend(void);
 // 机器人模组控制
 void ModuleControl(void);
+// 底盘跟随控制
+void ChassisFollow(void);
 
 #endif  // RM_FRAME_CONTROL_H

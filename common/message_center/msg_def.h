@@ -97,6 +97,7 @@ typedef struct {
   float gimbal_yaw_zero;     // yaw编码器零点
   bool yaw_init_finish;
   bool pitch_init_finish;
+  uint8_t init_finish;
 } GimbalFdbData;
 
 #endif  // RM_FRAME_MSG_DEF_H

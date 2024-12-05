@@ -304,12 +304,20 @@ void robotControl(void) {
   }
 }
 
-void ModuleControl(void) {
+void ChassisFollow(void) {
   chassis_ctrl_ref_.fdb_angle =
       gimbal_ctrl_fdb_.gimbal_yaw_encoder - gimbal_ctrl_fdb_.gimbal_yaw_zero;
-  chassis_ctrl_ref_.follow_fdb_angle = math::loopLimit(
-      gimbal_ctrl_fdb_.gimbal_yaw_encoder - gimbal_ctrl_fdb_.gimbal_yaw_zero,
-      -180, 180);
+  if (gimbal_ctrl_fdb_.yaw_init_finish) {
+    chassis_ctrl_ref_.follow_fdb_angle = math::loopLimit(
+        gimbal_ctrl_fdb_.gimbal_yaw_encoder - gimbal_ctrl_fdb_.gimbal_yaw_zero,
+        -180, 180);
+  } else {
+    chassis_ctrl_ref_.follow_fdb_angle = chassis_ctrl_ref_.ref_angle;
+  }
+}
+
+void ModuleControl(void) {
+  ChassisFollow();
 #if defined swerve_chassis || defined mecanum_chassis
   chassis.handle();
 #endif

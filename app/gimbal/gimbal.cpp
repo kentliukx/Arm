@@ -55,7 +55,6 @@ void Gimbal::init(void) {
   gm_pitch_->resetFeedbackAngle(gm_pitch_->motor_data_.angle);
   gimbal_fdb_send.pitch_init_finish = false;
   gimbal_fdb_send.yaw_init_finish = false;
-  now_tick = HAL_GetTick();
 }
 
 // Set gimbal angle and speed
@@ -107,16 +106,19 @@ void Gimbal::setMode(GimbalFdbMode_e mode) {
 }
 
 void Gimbal::ResetInitState(uint8_t state) {
+  static uint8_t last_state;
   if (state == 1) {
+    first_init_tick = 0;
+    if_first_init = false;
+  }
+  if (last_state == 1 && state == 0) {
     init_status_.yaw_finish = false;
     init_status_.pitch_finish = false;
-    gimbal_fdb_send.yaw_init_finish = init_status_.yaw_finish;
-    gimbal_fdb_send.pitch_init_finish = init_status_.pitch_finish;
-    first_init_tick = 0;
   } else {
     gimbal_fdb_send.yaw_init_finish = init_status_.yaw_finish;
     gimbal_fdb_send.pitch_init_finish = init_status_.pitch_finish;
   }
+  last_state = state;
 }
 
 void Gimbal::MotorControl() {
@@ -149,19 +151,8 @@ void Gimbal::handle(void) {
     setMode(ENCODER_MODE);
   }
 
-  ResetInitState(gimbal_cmd_rcv_.set_init_false);
-
   if (gimbal_cmd_rcv_.init_flag == 1) {
     init();
-  }
-
-  // 初始化完成信号
-  if (fabs(gm_yaw_->control_data_.fdb_angle) < 5 && first_init_tick != 0 &&
-      gimbal_cmd_rcv_.if_robot_power_on) {
-    init_status_.yaw_finish = gm_yaw_->connect_.check();
-    init_status_.pitch_finish = gm_pitch_->connect_.check();
-    gimbal_fdb_send.yaw_init_finish = init_status_.yaw_finish;
-    gimbal_fdb_send.pitch_init_finish = init_status_.pitch_finish;
   }
 
   // control指令控制
@@ -195,6 +186,8 @@ void Gimbal::handle(void) {
       gm_pitch_->ppid_.out_max_ = gimbal_init_speed_max;
     }
   }
+
+  ResetInitState(gimbal_cmd_rcv_.set_init_false);
 
   MotorControl();
 
