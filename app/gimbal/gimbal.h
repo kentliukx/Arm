@@ -29,7 +29,11 @@ typedef struct GimbalStatus {
 class Gimbal {
  public:
   Gimbal(Motor* gm_yaw, Motor* gm_pitch, IMU* imu);
+  // Send target status to motor and update feedback
+  // 设置电机目标状态，更新反馈数据
+  void handle(void);
 
+ protected:
   // Initialize gimbal, reset init flag
   // 云台初始化，重置回正标记
   void init(void);
@@ -56,15 +60,14 @@ class Gimbal {
   // 设置云台模式(imu反馈或编码器反馈)
   void setMode(GimbalFdbMode_e mode);
 
-  // Send target status to motor and update feedback
-  // 设置电机目标状态，更新反馈数据
-  void handle(void);
+  void ResetInitState(uint8_t state);
 
- private:
+  void MotorControl(void);
+
   // pitch轴力矩补偿(作为力矩前馈输入)
   float pitchCompensate(const float& pitch);
 
- public:
+ protected:
   Motor *gm_yaw_, *gm_pitch_;  // 电机指针
   IMU* imu_;                   // imu指针
 

@@ -106,6 +106,38 @@ void Gimbal::setMode(GimbalFdbMode_e mode) {
   mode_ = mode;
 }
 
+void Gimbal::ResetInitState(uint8_t state) {
+  if (state == 1) {
+    init_status_.yaw_finish = false;
+    init_status_.pitch_finish = false;
+    gimbal_fdb_send.yaw_init_finish = init_status_.yaw_finish;
+    gimbal_fdb_send.pitch_init_finish = init_status_.pitch_finish;
+    first_init_tick = 0;
+  } else {
+    gimbal_fdb_send.yaw_init_finish = init_status_.yaw_finish;
+    gimbal_fdb_send.pitch_init_finish = init_status_.pitch_finish;
+  }
+}
+
+void Gimbal::MotorControl() {
+  // 读取电机控制反馈
+  fdb_.yaw = gm_yaw_->control_data_.fdb_angle;
+  fdb_.pitch = gm_pitch_->control_data_.fdb_angle;
+  fdb_.yaw_speed = gm_yaw_->control_data_.fdb_speed;
+  fdb_.pitch_speed = gm_pitch_->control_data_.fdb_speed;
+
+  yaw_chassis_feedforward =
+      math::deadBand(ref_.yaw_speed - chassis_cmd_rcv_.wz, -15, 15) * 0.05f;
+
+  // 设置电机控制目标角度 & 角速度前馈 & 力矩前馈(补偿)
+  gm_yaw_->setAngleSpeed(ref_.yaw, ref_.yaw_speed + yaw_chassis_feedforward,
+                         00);
+  gm_pitch_->setAngleSpeed(ref_.pitch, ref_.pitch_speed, 0);
+
+  gimbal_fdb_send.gimbal_yaw_encoder = gm_yaw_->motor_data_.ecd_angle;
+  gimbal_fdb_send.gimbal_yaw_zero = yaw_zero_ecd;
+}
+
 void Gimbal::handle(void) {
   // 接收数据
   SubGetMessage(gimbal_sub_, &gimbal_cmd_rcv_);
@@ -117,21 +149,13 @@ void Gimbal::handle(void) {
     setMode(ENCODER_MODE);
   }
 
-  if (gimbal_cmd_rcv_.set_init_false == 1) {
-    init_status_.yaw_finish = false;
-    init_status_.pitch_finish = false;
-    gimbal_fdb_send.yaw_init_finish = init_status_.yaw_finish;
-    gimbal_fdb_send.pitch_init_finish = init_status_.pitch_finish;
-    first_init_tick = 0;
-  } else {
-    gimbal_fdb_send.yaw_init_finish = init_status_.yaw_finish;
-    gimbal_fdb_send.pitch_init_finish = init_status_.pitch_finish;
-  }
+  ResetInitState(gimbal_cmd_rcv_.set_init_false);
 
   if (gimbal_cmd_rcv_.init_flag == 1) {
     init();
   }
 
+  // 初始化完成信号
   if (fabs(gm_yaw_->control_data_.fdb_angle) < 5 && first_init_tick != 0 &&
       gimbal_cmd_rcv_.if_robot_power_on) {
     init_status_.yaw_finish = gm_yaw_->connect_.check();
@@ -140,11 +164,10 @@ void Gimbal::handle(void) {
     gimbal_fdb_send.pitch_init_finish = init_status_.pitch_finish;
   }
 
-  //  if (gimbal_cmd_rcv_.first_enter_flag == 1) {
-  //    setAngle(0, 0);
-  //  }
-
-  addAngle(gimbal_cmd_rcv_.add_yaw, gimbal_cmd_rcv_.add_pitch);
+  // control指令控制
+  if (first_init_tick == 0) {
+    addAngle(gimbal_cmd_rcv_.add_yaw, gimbal_cmd_rcv_.add_pitch);
+  }
 
   if (!init_status_.yaw_finish) {  // yaw初始化未完成
     init_status_.yaw_finish =
@@ -173,28 +196,7 @@ void Gimbal::handle(void) {
     }
   }
 
-  // 云台电机离线处理
-  //  if (!gm_yaw_->connect_.check() && !gm_pitch_->connect_.check() &&
-  //      HAL_GetTick() > 200) {
-  //    init();
-  //  }
-
-  // 读取电机控制反馈
-  fdb_.yaw = gm_yaw_->control_data_.fdb_angle;
-  fdb_.pitch = gm_pitch_->control_data_.fdb_angle;
-  fdb_.yaw_speed = gm_yaw_->control_data_.fdb_speed;
-  fdb_.pitch_speed = gm_pitch_->control_data_.fdb_speed;
-
-  yaw_chassis_feedforward =
-      math::deadBand(ref_.yaw_speed - chassis_cmd_rcv_.wz, -15, 15) * 0.05f;
-
-  // 设置电机控制目标角度 & 角速度前馈 & 力矩前馈(补偿)
-  gm_yaw_->setAngleSpeed(ref_.yaw, ref_.yaw_speed + yaw_chassis_feedforward,
-                         00);
-  gm_pitch_->setAngleSpeed(ref_.pitch, ref_.pitch_speed, 0);
-
-  gimbal_fdb_send.gimbal_yaw_encoder = gm_yaw_->motor_data_.ecd_angle;
-  gimbal_fdb_send.gimbal_yaw_zero = yaw_zero_ecd;
+  MotorControl();
 
   PubPushMessage(gimbal_pub_, &gimbal_fdb_send);
 }
