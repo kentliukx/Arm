@@ -156,7 +156,7 @@ void Gimbal::handle(void) {
   }
 
   // control指令控制
-  if (first_init_tick == 0) {
+  if (init_status_.pitch_finish && init_status_.yaw_finish) {
     addAngle(gimbal_cmd_rcv_.add_yaw, gimbal_cmd_rcv_.add_pitch);
   }
 
