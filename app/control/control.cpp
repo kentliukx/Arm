@@ -279,6 +279,7 @@ void robotControl(void) {
 
     float vel_norm = sqrtf(rc.channel_.r_col * rc.channel_.r_col +
                            rc.channel_.r_row * rc.channel_.r_row);
+    if (vel_norm < 1.f) vel_norm = 1.f;
     if (chassis_state == ChassisStateExt_e::FOLLOW) {
       chassis_ctrl_ref_.vx =
           -rc.channel_.r_col * rcctrl::chassis_speed_rate / vel_norm;
