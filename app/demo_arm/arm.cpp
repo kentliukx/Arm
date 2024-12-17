@@ -14,22 +14,22 @@
 
 //pid 待调
 Motor m1(Motor::M3508, 100, Motor::POSITION_SPEED,
-        PID(10, 0, 0, 1000, 1000),
-        PID(10, 0, 0, 1000, 5000), Motor::None, 0);
+        PID(200, 0, 0, 1000, 5000),
+        PID(20, 0, 0, 1000, 16384), Motor::None, 0);
 Motor m2(Motor::M3508, 100, Motor::POSITION_SPEED,
-        PID(20, 0, 0, 1000, 1000),
-        PID(20, 0, 0, 1000, 5000), Motor::None, 0);
+        PID(200, 0, 0, 1000, 5000),
+        PID(20, 0, 0, 1000, 16384), Motor::None, 0);
 Motor m3(Motor::M3508, 100, Motor::POSITION_SPEED,
-        PID(20, 0, 0, 1000, 1000),
-        PID(20, 0, 0, 1000, 5000), Motor::None, 0);
+        PID(200, 0, 0, 1000, 5000),
+        PID(20, 0, 0, 1000, 16384), Motor::None, 0);
 Motor m4(Motor::M3508, 19.2, Motor::POSITION_SPEED,
-        PID(10, 0, 0, 1000, 1000),
-        PID(10, 0, 0, 1000, 5000), Motor::None, 0);
+        PID(20, 0, 0, 1000, 5000),
+        PID(20, 0, 0, 1000, 16384), Motor::None, 0);
 Motor m5(Motor::M3508, 1, Motor::POSITION_SPEED,
-        PID(10, 0, 0, 1000, 1000),
+        PID(10, 0, 0, 1000, 5000),
         PID(10, 0, 0, 1000, 5000), Motor::None, 0);
 Motor m6(Motor::M3508, 1, Motor::POSITION_SPEED,
-        PID(10, 0, 0, 1000, 1000),
+        PID(10, 0, 0, 1000, 5000),
         PID(10, 0, 0, 1000, 5000), Motor::None, 0);
 
 
@@ -56,10 +56,6 @@ void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
       ref_pose.y=ref_pose.y*max_dist/dist;
       ref_pose.z=ref_pose.z*max_dist/dist;
     }
-
-    // if(ref_pose.x<1&&ref_pose.x>-1) ref_pose.x=1;
-    // if(ref_pose.y<1&&ref_pose.y>-1) ref_pose.y=1;
-    // if(ref_pose.z<1&&ref_pose.z>-1) ref_pose.z=1;
 
     //position to theta 1-3
     ref_joint.q[0] = atan2(ref_pose.y, ref_pose.x);
@@ -117,16 +113,6 @@ void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
     ref_joint.q[4] = atan2(T63.a21,T63.a11*cos(ref_joint.q[3]));
 }
 
-void Arm::get_joint() {
-    arm_joint.q[0] = m1.motor_data_.angle;
-    arm_joint.q[1] = m2.motor_data_.angle;
-    arm_joint.q[2] = m3.motor_data_.angle;
-    arm_joint.q[3] = m4.motor_data_.angle;
-    arm_joint.q[4] = m5.motor_data_.angle;
-    arm_joint.q[5] = m6.motor_data_.angle;
-}
-
-
 #define ANGLE_INCREMENT 0.1
 #define PITCH_YAW_INCREMENT 0.01
 extern RC rc;
@@ -165,6 +151,6 @@ void Arm::handle() {
     m3.setAngle(-ref_joint.q[2],0);
     m4.setAngle(ref_joint.q[3],0);
     m5.setAngle(ref_joint.q[4],0);
-    m6.setAngle(ref_joint.q[5],0);
+    m6.setAngle(-ref_joint.q[5],0);
 }
 

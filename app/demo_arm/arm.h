@@ -14,11 +14,10 @@ extern "C" {
 
 class Pose {
 public:
-    float x, y, z;
+    float x=0.01, y=0, z=0.5;
     float yaw, pitch, roll;
-
-    Pose(){}
 };
+
 
 class Joint {
 public:
