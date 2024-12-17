@@ -61,7 +61,7 @@ void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
     ref_joint.q[1] =
         ref_joint.q[0]
          + acos((l1*l1-l2*l2-ref_pose.x*ref_pose.x-ref_pose.y*ref_pose.y-ref_pose.z*ref_pose.z)
-             /2*l2*sqrt(ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z))
+             /(2*l2*sqrt(ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z)))
          - atan2(ref_pose.z, sqrt(ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y));
     ref_joint.q[2] =
         acos(ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z-l1*l1-l2*l2)/(2*l1*l2);
@@ -71,15 +71,16 @@ void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
 
     //theta 1-3 and pose to theta 4-6
     Posture_matrix T60;//from in 6 to in 0
-    T60.a11=cos(yaw_ref)*cos(pitch_ref);
-    T60.a12=cos(yaw_ref)*sin(pitch_ref)*sin(roll_ref)-sin(yaw_ref)*cos(roll_ref);
-    T60.a13=cos(yaw_ref)*sin(pitch_ref)*cos(roll_ref)+sin(yaw_ref)*sin(roll_ref);
-    T60.a21=sin(yaw_ref)*cos(pitch_ref);
-    T60.a22=sin(yaw_ref)*sin(pitch_ref)*sin(roll_ref)+cos(yaw_ref)*cos(roll_ref);
-    T60.a23=sin(yaw_ref)*sin(pitch_ref)*cos(roll_ref)-cos(yaw_ref)*sin(roll_ref);
-    T60.a31=-sin(pitch_ref);
-    T60.a32=cos(pitch_ref)*sin(roll_ref);
-    T60.a33=cos(pitch_ref)*cos(roll_ref);
+    T60.a11=cos(ref_pose.yaw)*cos(ref_pose.pitch);
+    T60.a12=cos(ref_pose.yaw)*sin(ref_pose.pitch)*sin(ref_pose.roll)-sin(ref_pose.yaw)*cos(ref_pose.roll);
+    T60.a13=cos(ref_pose.yaw)*sin(ref_pose.pitch)*cos(ref_pose.roll)+sin(ref_pose.yaw)*sin(ref_pose.roll);
+    T60.a21=sin(ref_pose.yaw)*cos(ref_pose.pitch);
+    T60.a22=sin(ref_pose.yaw)*sin(ref_pose.pitch)*sin(ref_pose.roll)+cos(ref_pose.yaw)*cos(ref_pose.roll);
+    T60.a23=sin(ref_pose.yaw)*sin(ref_pose.pitch)*cos(ref_pose.roll)-cos(ref_pose.yaw)*sin(ref_pose.roll);
+    T60.a31=-sin(ref_pose.pitch);
+    T60.a32=cos(ref_pose.pitch)*sin(ref_pose.roll);
+    T60.a33=cos(ref_pose.pitch)*cos(ref_pose.roll);
+
 
     Posture_matrix T31;
     T31.a11=cos(ref_joint.q[2]-ref_joint.q[1]);
