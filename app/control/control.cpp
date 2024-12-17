@@ -21,6 +21,7 @@
 #include "base/monitor/motor_monitor.h"
 #include "base/motor/motor.h"
 #include "hardware_config.h"
+#include "app/demo_arm/arm.h"
 
 // 机器人组件定义
 // 底盘
@@ -41,6 +42,7 @@ Gimbal gimbal(&GMY, &GMP, &board_imu);
 
 // 全局变量声明
 extern RC rc;
+extern Arm arm;
 
 // msg接收、发送mailbox
 ChassisCtrlCmd chassis_ctrl_ref_, chassis_ctrl_fdb_;
@@ -336,4 +338,5 @@ void ModuleControl(void) {
 #if defined infantry_shoot
   shoot.handle();
 #endif
+  arm.handle();
 }

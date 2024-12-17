@@ -78,4 +78,35 @@ float Vector4fNorm(const float vec[4]);
 void Vector3fUnit(const float vec[3], float res[3]);
 void Vector4fUnit(const float vec[4], float res[4]);
 
+template <size_t Rows, size_t Cols>
+class Matrixf {
+public:
+  float data[Rows][Cols];  // 存储矩阵元素
+
+  // 构造函数
+  Matrixf() {
+    for (size_t i = 0; i < Rows; i++) {
+      for (size_t j = 0; j < Cols; j++) {
+        data[i][j] = 0.0f;
+      }
+    }
+  }
+
+  // 重载索引操作符
+  float* operator[](size_t row) {
+    return data[row];
+  }
+
+  // 矩阵减法
+  Matrixf<Rows, Cols> operator-(const Matrixf<Rows, Cols>& other) {
+    Matrixf<Rows, Cols> result;
+    for (size_t i = 0; i < Rows; i++) {
+      for (size_t j = 0; j < Cols; j++) {
+        result[i][j] = this->data[i][j] - other.data[i][j];
+      }
+    }
+    return result;
+  }
+};
+
 #endif  // MATRIX_H

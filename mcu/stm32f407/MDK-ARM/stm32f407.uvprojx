@@ -10,14 +10,14 @@
       <TargetName>stm32f407</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6210000::V6.21::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407IGHx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.17.1</PackID>
-          <PackURL>https://www.keil.com/pack/</PackURL>
+          <PackID>Keil.STM32F4xx_DFP.2.16.0</PackID>
+          <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) FPU2 CPUTYPE("Cortex-M4")</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -819,6 +819,46 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\base\tof\tof.cpp</FilePath>
             </File>
+            <File>
+              <FileName>imu.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\base\imu\imu.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>mahony.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\base\imu\mahony.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>imu_monitor.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\base\monitor\imu_monitor.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>bmi088.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\base\imu\driver\bmi088.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>mpu6500.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\base\imu\driver\mpu6500.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>ist8310.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\base\imu\driver\ist8310.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rc_to_theta.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\app\demo_arm\rc_to_theta.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>arm.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\app\demo_arm\arm.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -874,11 +914,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\common\communication\board_comm\board_comm.cpp</FilePath>
             </File>
-            <File>
-              <FileName>heat_limit_infantry.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\common\heat_limit\heat_limit_infantry.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -913,6 +948,11 @@
               <FileName>motorinit.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\app\motorinit\motorinit.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>gimbal.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\app\gimbal\gimbal.cpp</FilePath>
             </File>
           </Files>
         </Group>
