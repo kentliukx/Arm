@@ -29,7 +29,7 @@ public:
 
 class Arm {
 public:
-    Motor m1, m2, m3, m4, m5, m6;
+    Motor& m1, m2, m3, m4, m5, m6;
     Joint arm_joint;
     Pose ref_pose;
     float l1, l2, l3;
