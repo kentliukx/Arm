@@ -128,30 +128,33 @@ void Arm::get_joint() {
     arm_joint.q[5] = m6.motor_data_.angle;
 }
 
+
+#define ANGLE_INCREMENT 10
+#define PITCH_YAW_INCREMENT 0.25
 extern RC rc;
+void Arm::updateRefPose() {
+    if (rc.switch_.l == 0) {
+        ref_pose.x += rc.channel_.r_col * ANGLE_INCREMENT;
+        ref_pose.y += rc.channel_.r_row * ANGLE_INCREMENT;
+        ref_pose.z += rc.channel_.l_col * ANGLE_INCREMENT;
+    } else if (rc.switch_.l == 1) {
+        ref_pose.pitch += rc.channel_.r_col * PITCH_YAW_INCREMENT;
+        ref_pose.yaw += rc.channel_.r_row * PITCH_YAW_INCREMENT;
+        ref_pose.roll += rc.channel_.l_row * PITCH_YAW_INCREMENT;
+    }
+}
+
 
 void Arm::handle() {
 
-    if (rc.switch_.l==0)
-    {
-        ref_pose.x+=rc.channel_.r_col*10;//cm
-        ref_pose.y+=rc.channel_.r_row*10;
-        ref_pose.z+=rc.channel_.l_col*10;
-    }
-    else if (rc.switch_.l==1)
-    {
-        ref_pose.pitch+=rc.channel_.r_col/4;//rad
-        ref_pose.yaw+=rc.channel_.r_row/4;
-        ref_pose.roll+=rc.channel_.l_row/4;
-    }
-
-    Joint ref_joint;
+    updateRefPose();
 
     //由末端姿态得到1-6角度
+    Joint ref_joint;
     ikine(ref_pose, ref_joint);
-    get_joint();
 
     //轨迹插值
+    get_joint();
     Trajectory ref_trajectory(arm_joint, ref_joint);
     ref_trajectory.handle();
 

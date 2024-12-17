@@ -42,6 +42,7 @@ public:
         }
     }
     void canId(uint16_t can_id[6]);
+    void updateRefPose();
     void rc_to_theta();
     void get_joint();
     void handle();
