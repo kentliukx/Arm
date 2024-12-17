@@ -55,9 +55,7 @@ void Arm::canId(uint16_t can_id[6]) {
 }
 
 void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
-    //to do
-    //
-    //
+
     //position to theta 1-3
     ref_joint.q[0] = atan2(-ref_pose.y, ref_pose.x);
     ref_joint.q[1] =
@@ -72,51 +70,49 @@ void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
     ref_joint.q[5] = 0;
 
     //theta 1-3 and pose to theta 4-6
+    Posture_matrix T60;//from in 6 to in 0
+    T60.a11=cos(yaw_ref)*cos(pitch_ref);
+    T60.a12=cos(yaw_ref)*sin(pitch_ref)*sin(roll_ref)-sin(yaw_ref)*cos(roll_ref);
+    T60.a13=cos(yaw_ref)*sin(pitch_ref)*cos(roll_ref)+sin(yaw_ref)*sin(roll_ref);
+    T60.a21=sin(yaw_ref)*cos(pitch_ref);
+    T60.a22=sin(yaw_ref)*sin(pitch_ref)*sin(roll_ref)+cos(yaw_ref)*cos(roll_ref);
+    T60.a23=sin(yaw_ref)*sin(pitch_ref)*cos(roll_ref)-cos(yaw_ref)*sin(roll_ref);
+    T60.a31=-sin(pitch_ref);
+    T60.a32=cos(pitch_ref)*sin(roll_ref);
+    T60.a33=cos(pitch_ref)*cos(roll_ref);
 
-    Posture_matrix T70;//from in 7 to in 0
-    T70.a11=cos(ref_pose.yaw)*cos(ref_pose.pitch);
-    T70.a12=cos(ref_pose.yaw)*sin(ref_pose.pitch)*sin(ref_pose.roll)-sin(ref_pose.yaw)*cos(ref_pose.roll);
-    T70.a13=cos(ref_pose.yaw)*sin(ref_pose.pitch)*cos(ref_pose.roll)+sin(ref_pose.yaw)*sin(ref_pose.roll);
-    T70.a21=sin(ref_pose.yaw)*cos(ref_pose.pitch);
-    T70.a22=sin(ref_pose.yaw)*sin(ref_pose.pitch)*sin(ref_pose.roll)+cos(ref_pose.yaw)*cos(ref_pose.roll);
-    T70.a23=sin(ref_pose.yaw)*sin(ref_pose.pitch)*cos(ref_pose.roll)-cos(ref_pose.yaw)*sin(ref_pose.roll);
-    T70.a31=-sin(ref_pose.pitch);
-    T70.a32=cos(ref_pose.pitch)*sin(ref_pose.roll);
-    T70.a33=cos(ref_pose.pitch)*cos(ref_pose.roll);
-
-
-    Posture_matrix T41;
-    T41.a11=cos(ref_joint.q[1]-ref_joint.q[0]);
-    T41.a12=0;
-    T41.a13=-sin(ref_joint.q[1]-ref_joint.q[0]);
-    T41.a21=0;
-    T41.a22=1;
-    T41.a23=0;
-    T41.a31=sin(ref_joint.q[1]-ref_joint.q[0]);
-    T41.a32=0;
-    T41.a33=cos(ref_joint.q[1]-ref_joint.q[0]);
+    Posture_matrix T31;
+    T31.a11=cos(ref_joint.q[2]-ref_joint.q[1]);
+    T31.a12=-sin(ref_joint.q[2]-ref_joint.q[1]);
+    T31.a13=0;
+    T31.a21=sin(ref_joint.q[2]-ref_joint.q[1]);
+    T31.a22=cos(ref_joint.q[2]-ref_joint.q[1]);
+    T31.a23=0;
+    T31.a31=0;
+    T31.a32=0;
+    T31.a33=1;
 
     Posture_matrix T10;
     T10.a11=cos(ref_joint.q[0]);
-    T10.a12=sin(ref_joint.q[0]);
-    T10.a13=0;
-    T10.a21=-sin(ref_joint.q[0]);
-    T10.a22=cos(ref_joint.q[0]);
+    T10.a12=0;
+    T10.a13=sin(ref_joint.q[0]);
+    T10.a21=0;
+    T10.a22=1;
     T10.a23=0;
-    T10.a31=0;
+    T10.a31=-sin(ref_joint.q[0]);
     T10.a32=0;
-    T10.a33=1;
+    T10.a33=cos(ref_joint.q[0]);
 
-    Posture_matrix T40=Posture_Matrix_Multiply(&T10,&T41);
+    Posture_matrix T30=Posture_Matrix_Multiply(&T10,&T31);
 
-    Posture_matrix T04=Posture_Matrix_Tr(&T40);
+    Posture_matrix T03=Posture_Matrix_Tr(&T30);
 
-    Posture_matrix T74=Posture_Matrix_Multiply(&T04,&T70);
+    Posture_matrix T63=Posture_Matrix_Multiply(&T03,&T60);
 
-    ref_joint.q[4]=acos(T74.a11);
-    ref_joint.q[5]=acos(-T74.a13/sqrt(1-sin(ref_joint.q[4])*sin(ref_joint.q[4])));
-    ref_joint.q[3]=acos(T74.a31/sqrt(1-sin(ref_joint.q[4])*sin(ref_joint.q[4])));
-
+    //caculate X'Z'X' back
+    ref_joint.q[3] = atan2(T63.a31,T63.a21);
+    ref_joint.q[5] = atan2(T63.a13,-T63.a12);
+    ref_joint.q[4] = atan2(T63.a21,T63.a11*cos(ref_joint.q[3]));
 }
 
 void Arm::get_joint() {
