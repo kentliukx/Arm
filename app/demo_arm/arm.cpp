@@ -9,31 +9,33 @@
 #include <base/remote/remote.h>
 
 #include "rc_to_theta.h"
+#include "base/monitor/motor_monitor.h"
 
 
 //pid 待调
 Motor m1(Motor::M3508, 100, Motor::POSITION_SPEED,
-        PID(0, 0, 0, 1000, 1000),
-        PID(0, 0, 0, 1000, 1000), Motor::None, 0);
+        PID(10, 0, 0, 1000, 1000),
+        PID(10, 0, 0, 1000, 5000), Motor::None, 0);
 Motor m2(Motor::M3508, 100, Motor::POSITION_SPEED,
-        PID(0, 0, 0, 1000, 1000),
-        PID(0, 0, 0, 1000, 1000), Motor::None, 0);
+        PID(20, 0, 0, 1000, 1000),
+        PID(20, 0, 0, 1000, 5000), Motor::None, 0);
 Motor m3(Motor::M3508, 100, Motor::POSITION_SPEED,
-        PID(0, 0, 0, 1000, 1000),
-        PID(0, 0, 0, 1000, 1000), Motor::None, 0);
+        PID(20, 0, 0, 1000, 1000),
+        PID(20, 0, 0, 1000, 5000), Motor::None, 0);
 Motor m4(Motor::M3508, 19.2, Motor::POSITION_SPEED,
-        PID(0, 0, 0, 1000, 1000),
-        PID(0, 0, 0, 1000, 1000), Motor::None, 0);
+        PID(10, 0, 0, 1000, 1000),
+        PID(10, 0, 0, 1000, 5000), Motor::None, 0);
 Motor m5(Motor::M3508, 1, Motor::POSITION_SPEED,
-        PID(0, 0, 0, 1000, 1000),
-        PID(0, 0, 0, 1000, 1000), Motor::None, 0);
+        PID(10, 0, 0, 1000, 1000),
+        PID(10, 0, 0, 1000, 5000), Motor::None, 0);
 Motor m6(Motor::M3508, 1, Motor::POSITION_SPEED,
-        PID(0, 0, 0, 1000, 1000),
-        PID(0, 0, 0, 1000, 1000), Motor::None, 0);
+        PID(10, 0, 0, 1000, 1000),
+        PID(10, 0, 0, 1000, 5000), Motor::None, 0);
 
 
-uint16_t can_ids[6] = {0x201, 0x202, 0x203, 0x204, 0x205, 0x206};
-Arm arm(m1, m2, m3, m4, m5, m6, can_ids);
+
+
+Arm arm(m1, m2, m3, m4, m5, m6);
 
 
 
@@ -45,29 +47,28 @@ void Trajectory::handle() {
     }
 }
 
-void Arm::canId(uint16_t can_id[6]) {
-    m1.CANIdConfig(1,can_id[0]);
-    m2.CANIdConfig(1,can_id[1]);
-    m3.CANIdConfig(1,can_id[2]);
-    m4.CANIdConfig(1,can_id[3]);
-    m5.CANIdConfig(1,can_id[4]);
-    m6.CANIdConfig(1,can_id[5]);
-}
-
 void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
 
+    float dist=ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z;//距离过大时，指向要达到的那个点
+    float max_dist=0.99*(l1+l2)*(l1+l2);
+    if(dist>max_dist) {
+      ref_pose.x=ref_pose.x*max_dist/dist;
+      ref_pose.y=ref_pose.y*max_dist/dist;
+      ref_pose.z=ref_pose.z*max_dist/dist;
+    }
+
+    // if(ref_pose.x<1&&ref_pose.x>-1) ref_pose.x=1;
+    // if(ref_pose.y<1&&ref_pose.y>-1) ref_pose.y=1;
+    // if(ref_pose.z<1&&ref_pose.z>-1) ref_pose.z=1;
+
     //position to theta 1-3
-    ref_joint.q[0] = atan2(-ref_pose.y, ref_pose.x);
-    ref_joint.q[1] =
-        ref_joint.q[0]
-         + acos((l1*l1-l2*l2-ref_pose.x*ref_pose.x-ref_pose.y*ref_pose.y-ref_pose.z*ref_pose.z)
-             /(2*l2*sqrt(ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z)))
-         - atan2(ref_pose.z, sqrt(ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y));
+    ref_joint.q[0] = atan2(ref_pose.y, ref_pose.x);
+    ref_joint.q[1] =3.1415926-atan2(ref_pose.z, sqrt(ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y))
+         - acos((-l2*l2+l1*l1+ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z)
+             /(2*l1*sqrt(ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z)));
+
     ref_joint.q[2] =
-        acos(ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z-l1*l1-l2*l2)/(2*l1*l2);
-    ref_joint.q[3] = 0;
-    ref_joint.q[4] = 0;
-    ref_joint.q[5] = 0;
+        acos((-ref_pose.x*ref_pose.x-ref_pose.y*ref_pose.y-ref_pose.z*ref_pose.z+l1*l1+l2*l2)/(2*l1*l2));
 
     //theta 1-3 and pose to theta 4-6
     Posture_matrix T60;//from in 6 to in 0
@@ -126,13 +127,13 @@ void Arm::get_joint() {
 }
 
 
-#define ANGLE_INCREMENT 10
-#define PITCH_YAW_INCREMENT 0.25
+#define ANGLE_INCREMENT 0.1
+#define PITCH_YAW_INCREMENT 0.01
 extern RC rc;
 void Arm::updateRefPose() {
     if (rc.switch_.l == 0) {
         ref_pose.x += rc.channel_.r_col * ANGLE_INCREMENT;
-        ref_pose.y += rc.channel_.r_row * ANGLE_INCREMENT;
+        ref_pose.y -= rc.channel_.r_row * ANGLE_INCREMENT;
         ref_pose.z += rc.channel_.l_col * ANGLE_INCREMENT;
     } else if (rc.switch_.l == 1) {
         ref_pose.pitch += rc.channel_.r_col * PITCH_YAW_INCREMENT;
@@ -141,26 +142,29 @@ void Arm::updateRefPose() {
     }
 }
 
-
+Joint ref_joint;
 void Arm::handle() {
 
     updateRefPose();
 
     //由末端姿态得到1-6角度
-    Joint ref_joint;
+
     ikine(ref_pose, ref_joint);
 
     //轨迹插值
-    get_joint();
-    Trajectory ref_trajectory(arm_joint, ref_joint);
-    ref_trajectory.handle();
+    // get_joint();
+    // Trajectory ref_trajectory(arm_joint, ref_joint);
+    // ref_trajectory.handle();
 
-    //发包
-    m1.setAngle(ref_trajectory.interpolate_joint.q[0], 0);
-    m2.setAngle(ref_trajectory.interpolate_joint.q[1], 0);
-    m3.setAngle(ref_trajectory.interpolate_joint.q[2], 0);
-    m4.setAngle(ref_trajectory.interpolate_joint.q[3], 0);
-    m5.setAngle(ref_trajectory.interpolate_joint.q[4], 0);
-    m6.setAngle(ref_trajectory.interpolate_joint.q[5], 0);
+    //设置角度
+
+    for(int i=0; i<6; i++) ref_joint.q[i]*=57.3;
+
+    m1.setAngle(ref_joint.q[0],0);
+    m2.setAngle(-ref_joint.q[1],0);
+    m3.setAngle(-ref_joint.q[2],0);
+    m4.setAngle(ref_joint.q[3],0);
+    m5.setAngle(ref_joint.q[4],0);
+    m6.setAngle(ref_joint.q[5],0);
 }
 

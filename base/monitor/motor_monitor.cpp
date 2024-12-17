@@ -19,6 +19,7 @@
 // Chassis motor 底盘电机
 const PID chassis_wheel_spid(10, 0, 0, 0, 16384);
 const float CHASSIS_MOTOR_RATIO = -13.9f;
+
 Motor CMFL(Motor::M3508, CHASSIS_MOTOR_RATIO,
            Motor::SPEED,                     // type, ratio, method
            PID(), PID(chassis_wheel_spid));  // ppid, spid
@@ -68,6 +69,9 @@ Motor GMP(Motor::GM6020, 1, Motor::POSITION_SPEED,   // type, ratio, method
           PID(500, 0, 0, 500, 30000),                // spid
           Motor::None, 0, true);                     // use kf
 
+extern Motor m1,m2,m3,m4,m5,m6;
+
+
 // 上板
 // Motor* can1_dji_motor[11] = {
 //    &CMFL,    // id:1
@@ -98,12 +102,12 @@ Motor GMP(Motor::GM6020, 1, Motor::POSITION_SPEED,   // type, ratio, method
 
 // 下板
 Motor* can1_dji_motor[11] = {
-    &FRICR,   // id:1
-    nullptr,  // id:2
-    &FRICL,   // id:3
-    nullptr,  // id:4
-    &GMP,     // id:5
-    nullptr,  // id:6
+    &m1,   // id:1
+    &m2,  // id:2
+    &m3,   // id:3
+    &m4,  // id:4
+    &m5,     // id:5
+    &m6,  // id:6
     nullptr,  // id:7
     nullptr,  // id:8
     nullptr,  // id:9

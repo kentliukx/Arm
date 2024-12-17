@@ -29,19 +29,15 @@ public:
 
 class Arm {
 public:
-    Motor& m1, m2, m3, m4, m5, m6;
+    Motor &m1, &m2, &m3, &m4, &m5, &m6;
     Joint arm_joint;
     Pose ref_pose;
-    float l1, l2, l3;
+    float l1=30, l2=30, l3=30;
     uint16_t can_id[6];
 
-    Arm(Motor &m1, Motor &m2, Motor &m3, Motor &m4, Motor &m5, Motor &m6, uint16_t can_id[6])
+    Arm(Motor &m1, Motor &m2, Motor &m3, Motor &m4, Motor &m5, Motor &m6 )
         : m1(m1), m2(m2), m3(m3), m4(m4), m5(m5), m6(m6) {
-        for (int i = 0; i < 6; ++i) {
-            this->can_id[i] = can_id[i];
-        }
     }
-    void canId(uint16_t can_id[6]);
     void updateRefPose();
     void rc_to_theta();
     void get_joint();
