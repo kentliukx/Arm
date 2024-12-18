@@ -14,7 +14,7 @@ extern "C" {
 
 class Pose {
 public:
-    float x=0.01, y=0, z=0.5;
+    float x=1, y=0, z=10;
     float yaw, pitch, roll;
 };
 

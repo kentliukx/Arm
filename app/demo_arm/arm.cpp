@@ -44,6 +44,8 @@ void Trajectory::handle() {
     }
 }
 
+Posture_matrix T63,T30,T60,T31,T10;
+
 void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
   float dist=sqrt(ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z);//距离过大时，指向要达到的那个点
   float max_dist=0.99*(l1+l2);
@@ -71,7 +73,7 @@ void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
   ref_joint.q[2] =
       acos((-control_x*control_x-control_y*control_y-control_z*control_z+l1*l1+l2*l2)/(2*l1*l2));
 
-    Posture_matrix T60;//from in 6 to in 0
+    //from in 6 to in 0
     /*
 
         Z   Y
@@ -105,7 +107,6 @@ void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
     T60.a33=cos(ref_pose.pitch)*cos(ref_pose.roll);
 
 
-    Posture_matrix T31;
     T31.a11=cos(ref_joint.q[1]-ref_joint.q[2]);
     T31.a12=0;
     T31.a13=sin(ref_joint.q[1]-ref_joint.q[2]);
@@ -116,27 +117,26 @@ void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
     T31.a32=0;
     T31.a33=cos(ref_joint.q[1]-ref_joint.q[2]);
 
-    Posture_matrix T10;
     T10.a11=cos(ref_joint.q[0]);
-    T10.a12=sin(ref_joint.q[0]);
+    T10.a12=-sin(ref_joint.q[0]);
     T10.a13=0;
-    T10.a21=-sin(ref_joint.q[0]);
+    T10.a21=sin(ref_joint.q[0]);
     T10.a22=cos(ref_joint.q[0]);
     T10.a23=0;
     T10.a31=0;
     T10.a32=0;
     T10.a33=1;
 
-    Posture_matrix T30=Posture_Matrix_Multiply(&T10,&T31);
+    T30=Posture_Matrix_Multiply(&T10,&T31);
 
     Posture_matrix T03=Posture_Matrix_Tr(&T30);
 
-    Posture_matrix T63=Posture_Matrix_Multiply(&T03,&T60);
+    T63=Posture_Matrix_Multiply(&T03,&T60);
 
     //caculate X'Y'X' back
     ref_joint.q[3] = atan2(T63.a21,-T63.a31);
     ref_joint.q[5] = atan2(T63.a12,T63.a13);
-    ref_joint.q[4] = atan2(T63.a21,T63.a11*cos(ref_joint.q[3]));
+    ref_joint.q[4] = atan2(T63.a21,T63.a11*sin(ref_joint.q[3]));
 }
 
 #define ANGLE_INCREMENT 0.1
