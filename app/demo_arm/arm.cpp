@@ -32,9 +32,6 @@ Motor m6(Motor::M3508, 1, Motor::POSITION_SPEED,
         PID(10, 0, 0, 1000, 5000),
         PID(10, 0, 0, 1000, 5000), Motor::None, 0);
 
-
-
-
 Arm arm(m1, m2, m3, m4, m5, m6);
 
 
@@ -48,7 +45,8 @@ void Trajectory::handle() {
 }
 
 void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
-  float dist=ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z;//距离过大时，指向要达到的那个点
+  //距离过大时，指向要达到的那个点
+  float dist=ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z;
   float max_dist=0.99*(l1+l2)*(l1+l2);
   float control_x=ref_pose.x,control_y=ref_pose.y,control_z=ref_pose.z;
   if(dist>max_dist) {
@@ -56,66 +54,86 @@ void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
     control_y=ref_pose.y*max_dist/dist;
     control_z=ref_pose.z*max_dist/dist;
   }
-
+  //规避距离过小的点
   if(ref_pose.x<0.01&&ref_pose.x>-0.01) control_x=0.01;
   if(ref_pose.y<0.01&&ref_pose.y>-0.01) control_y=0.01;
   if(ref_pose.z<0.01&&ref_pose.z>-0.01) control_z=0.01;
 
+  //xyz to q0~2
   ref_joint.q[0] = atan2(control_y, control_x);
-  ref_joint.q[1] =3.1415926-atan2(control_z, sqrt(control_x*control_x+control_y*control_y))
+  ref_joint.q[1] =PI -atan2(control_z, sqrt(control_x*control_x+control_y*control_y))
        - acos((-l2*l2+l1*l1+control_x*control_x+control_y*control_y+control_z*control_z)
            /(2*l1*sqrt(control_x*control_x+control_y*control_y+control_z*control_z)));
 
   ref_joint.q[2] =
       acos((-control_x*control_x-control_y*control_y-control_z*control_z+l1*l1+l2*l2)/(2*l1*l2));
 
-  //theta 1-3 and pose to theta 4-6
-  Posture_matrix T60;//from in 6 to in 0
-  T60.a11=cos(ref_pose.yaw)*cos(ref_pose.pitch);
-  T60.a12=cos(ref_pose.yaw)*sin(ref_pose.pitch)*sin(ref_pose.roll)-sin(ref_pose.yaw)*cos(ref_pose.roll);
-  T60.a13=cos(ref_pose.yaw)*sin(ref_pose.pitch)*cos(ref_pose.roll)+sin(ref_pose.yaw)*sin(ref_pose.roll);
-  T60.a21=sin(ref_pose.yaw)*cos(ref_pose.pitch);
-  T60.a22=sin(ref_pose.yaw)*sin(ref_pose.pitch)*sin(ref_pose.roll)+cos(ref_pose.yaw)*cos(ref_pose.roll);
-  T60.a23=sin(ref_pose.yaw)*sin(ref_pose.pitch)*cos(ref_pose.roll)-cos(ref_pose.yaw)*sin(ref_pose.roll);
-  T60.a31=-sin(ref_pose.pitch);
-  T60.a32=cos(ref_pose.pitch)*sin(ref_pose.roll);
-  T60.a33=cos(ref_pose.pitch)*cos(ref_pose.roll);
+    Posture_matrix T60;//from in 6 to in 0
+    /*
+
+        Z   Y
+        |  /
+        | /
+        |/
+        .______ X
+
+    coord 0, in which target x,y,z and roll,pitch,yaw are defined
+
+       ___________\()/ ~~[Ouch!]
+        \)q[2]     ||
+         \        /  \  <-lkx
+          \
+       q[1]\
+     _ _ _(_\_____
+
+    how q[1] and q[2] are defined
+
+    */
+
+    //q0~2 and rpy to q4~6
+    T60.a11=cos(ref_pose.yaw)*cos(ref_pose.pitch);
+    T60.a12=cos(ref_pose.yaw)*sin(ref_pose.pitch)*sin(ref_pose.roll)-sin(ref_pose.yaw)*cos(ref_pose.roll);
+    T60.a13=cos(ref_pose.yaw)*sin(ref_pose.pitch)*cos(ref_pose.roll)+sin(ref_pose.yaw)*sin(ref_pose.roll);
+    T60.a21=sin(ref_pose.yaw)*cos(ref_pose.pitch);
+    T60.a22=sin(ref_pose.yaw)*sin(ref_pose.pitch)*sin(ref_pose.roll)+cos(ref_pose.yaw)*cos(ref_pose.roll);
+    T60.a23=sin(ref_pose.yaw)*sin(ref_pose.pitch)*cos(ref_pose.roll)-cos(ref_pose.yaw)*sin(ref_pose.roll);
+    T60.a31=-sin(ref_pose.pitch);
+    T60.a32=cos(ref_pose.pitch)*sin(ref_pose.roll);
+    T60.a33=cos(ref_pose.pitch)*cos(ref_pose.roll);
 
 
+    Posture_matrix T31;
+    T31.a11=cos(ref_joint.q[1]-ref_joint.q[2]);
+    T31.a12=0;
+    T31.a13=sin(ref_joint.q[1]-ref_joint.q[2]);
+    T31.a21=0;
+    T31.a22=1;
+    T31.a23=0;
+    T31.a31=-sin(ref_joint.q[1]-ref_joint.q[2]);
+    T31.a32=0;
+    T31.a33=cos(ref_joint.q[1]-ref_joint.q[2]);
 
+    Posture_matrix T10;
+    T10.a11=cos(ref_joint.q[0]);
+    T10.a12=sin(ref_joint.q[0]);
+    T10.a13=0;
+    T10.a21=-sin(ref_joint.q[0]);
+    T10.a22=cos(ref_joint.q[0]);
+    T10.a23=0;
+    T10.a31=0;
+    T10.a32=0;
+    T10.a33=1;
 
-  Posture_matrix T31;
-  T31.a11=cos(ref_joint.q[2]-ref_joint.q[1]);
-  T31.a12=-sin(ref_joint.q[2]-ref_joint.q[1]);
-  T31.a13=0;
-  T31.a21=sin(ref_joint.q[2]-ref_joint.q[1]);
-  T31.a22=cos(ref_joint.q[2]-ref_joint.q[1]);
-  T31.a23=0;
-  T31.a31=0;
-  T31.a32=0;
-  T31.a33=1;
+    Posture_matrix T30=Posture_Matrix_Multiply(&T10,&T31);
 
-  Posture_matrix T10;
-  T10.a11=cos(ref_joint.q[0]);
-  T10.a12=0;
-  T10.a13=sin(ref_joint.q[0]);
-  T10.a21=0;
-  T10.a22=1;
-  T10.a23=0;
-  T10.a31=-sin(ref_joint.q[0]);
-  T10.a32=0;
-  T10.a33=cos(ref_joint.q[0]);
+    Posture_matrix T03=Posture_Matrix_Tr(&T30);
 
-  Posture_matrix T30=Posture_Matrix_Multiply(&T10,&T31);
+    Posture_matrix T63=Posture_Matrix_Multiply(&T03,&T60);
 
-  Posture_matrix T03=Posture_Matrix_Tr(&T30);
-
-  Posture_matrix T63=Posture_Matrix_Multiply(&T03,&T60);
-
-  //caculate X'Z'X' back
-  ref_joint.q[3] = atan2(T63.a31,T63.a21);
-  ref_joint.q[5] = atan2(T63.a13,-T63.a12);
-  ref_joint.q[4] = atan2(T63.a21,T63.a11*cos(ref_joint.q[3]));
+    //caculate X'Y'X' back
+    ref_joint.q[3] = atan2(T63.a21,-T63.a31);
+    ref_joint.q[5] = atan2(T63.a12,T63.a13);
+    ref_joint.q[4] = atan2(T63.a21,T63.a11*cos(ref_joint.q[3]));
 }
 
 #define ANGLE_INCREMENT 0.1
@@ -155,7 +173,7 @@ void Arm::handle() {
     m2.setAngle(-ref_joint.q[1],0);
     m3.setAngle(-ref_joint.q[2],0);
     m4.setAngle(ref_joint.q[3],0);
-    m5.setAngle(-ref_joint.q[4],0);
+    m5.setAngle(ref_joint.q[4],0);
     m6.setAngle(ref_joint.q[5],0);
 }
 
