@@ -15,22 +15,22 @@
 //pid 待调
 Motor m1(Motor::M3508, 100, Motor::POSITION_SPEED,
         PID(20, 0, 0, 1000, 5000),
-        PID(200, 0, 0, 1000, 16384), Motor::None, 0);
+        PID(150, 0, 0, 1000, 16384), Motor::None, 0);
 Motor m2(Motor::M3508, 100, Motor::POSITION_SPEED,
         PID(20, 0, 0, 1000, 5000),
-        PID(200, 0, 0, 1000, 16384), Motor::None, 0);
+        PID(150, 0, 0, 1000, 16384), Motor::None, 0);
 Motor m3(Motor::M3508, 100, Motor::POSITION_SPEED,
         PID(20, 0, 0, 1000, 5000),
-        PID(200, 0, 0, 1000, 16384), Motor::None, 0);
+        PID(150, 0, 0, 1000, 16384), Motor::None, 0);
 Motor m4(Motor::M3508, 19.2, Motor::POSITION_SPEED,
-        PID(20, 0, 0, 1000, 5000),
+        PID(10, 0, 0, 1000, 5000),
         PID(20, 0, 0, 1000, 16384), Motor::None, 0);
 Motor m5(Motor::M3508, 1, Motor::POSITION_SPEED,
-        PID(10, 0, 0, 1000, 5000),
-        PID(10, 0, 0, 1000, 5000), Motor::None, 0);
+        PID(5, 0, 0, 1000, 5000),
+        PID(5, 0, 0, 1000, 5000), Motor::None, 0);
 Motor m6(Motor::M3508, 1, Motor::POSITION_SPEED,
-        PID(10, 0, 0, 1000, 5000),
-        PID(10, 0, 0, 1000, 5000), Motor::None, 0);
+        PID(5, 0, 0, 1000, 5000),
+        PID(5, 0, 0, 1000, 5000), Motor::None, 0);
 
 Arm arm(m1, m2, m3, m4, m5, m6);
 
@@ -45,23 +45,26 @@ void Trajectory::handle() {
 }
 
 void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
-  //距离过大时，指向要达到的那个点
-  float dist=ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z;
-  float max_dist=0.99*(l1+l2)*(l1+l2);
-  float control_x=ref_pose.x,control_y=ref_pose.y,control_z=ref_pose.z;
+  float dist=sqrt(ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z);//距离过大时，指向要达到的那个点
+  float max_dist=0.99*(l1+l2);
+  float control_x,control_y,control_z;
+
+  control_x=ref_pose.x;
+  control_y=ref_pose.y;
+  control_z=ref_pose.z;
+
   if(dist>max_dist) {
     control_x=ref_pose.x*max_dist/dist;
     control_y=ref_pose.y*max_dist/dist;
     control_z=ref_pose.z*max_dist/dist;
   }
-  //规避距离过小的点
-  if(ref_pose.x<0.01&&ref_pose.x>-0.01) control_x=0.01;
-  if(ref_pose.y<0.01&&ref_pose.y>-0.01) control_y=0.01;
-  if(ref_pose.z<0.01&&ref_pose.z>-0.01) control_z=0.01;
 
-  //xyz to q0~2
+  if(control_x<0.01&&control_x>-0.01) control_x=0.01;
+  if(control_y<0.01&&control_y>-0.01) control_y=0.01;
+  if(control_z<0.01&&control_z>-0.01) control_z=0.01;
+
   ref_joint.q[0] = atan2(control_y, control_x);
-  ref_joint.q[1] =PI -atan2(control_z, sqrt(control_x*control_x+control_y*control_y))
+  ref_joint.q[1] =3.1415926-atan2(control_z, sqrt(control_x*control_x+control_y*control_y))
        - acos((-l2*l2+l1*l1+control_x*control_x+control_y*control_y+control_z*control_z)
            /(2*l1*sqrt(control_x*control_x+control_y*control_y+control_z*control_z)));
 
