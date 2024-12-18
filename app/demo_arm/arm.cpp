@@ -26,11 +26,11 @@ Motor m4(Motor::M3508, 19.2, Motor::POSITION_SPEED,
         PID(10, 0, 0, 1000, 5000),
         PID(20, 0, 0, 1000, 16384), Motor::None, 0);
 Motor m5(Motor::M3508, 1, Motor::POSITION_SPEED,
-        PID(5, 0, 0, 1000, 5000),
-        PID(5, 0, 0, 1000, 5000), Motor::None, 0);
+        PID(10, 0, 0, 1000, 5000),
+        PID(10, 0, 0, 1000, 5000), Motor::None, 0);
 Motor m6(Motor::M3508, 1, Motor::POSITION_SPEED,
-        PID(5, 0, 0, 1000, 5000),
-        PID(5, 0, 0, 1000, 5000), Motor::None, 0);
+        PID(10, 0, 0, 1000, 5000),
+        PID(10, 0, 0, 1000, 5000), Motor::None, 0);
 
 Arm arm(m1, m2, m3, m4, m5, m6);
 
@@ -151,6 +151,13 @@ void Arm::updateRefPose() {
         ref_pose.pitch += rc.channel_.r_col * PITCH_YAW_INCREMENT;
         ref_pose.yaw += rc.channel_.r_row * PITCH_YAW_INCREMENT;
         ref_pose.roll += rc.channel_.l_row * PITCH_YAW_INCREMENT;
+    } else if (rc.switch_.l == 2) {
+        ref_pose.x=1;
+        ref_pose.y=0;
+        ref_pose.z=10;
+        ref_pose.pitch=0;
+        ref_pose.yaw=0;
+        ref_pose.roll=0;
     }
 }
 
@@ -170,7 +177,7 @@ void Arm::handle() {
 
     //设置角度
 
-    for(int i=0; i<6; i++) ref_joint.q[i]*=57.3;
+    for(int i=0; i<6; i++) ref_joint.q[i]*=57.295781;
 
     m1.setAngle(ref_joint.q[0],0);
     m2.setAngle(-ref_joint.q[1],0);
