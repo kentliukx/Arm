@@ -46,7 +46,7 @@ void Trajectory::handle() {
 
 Posture_matrix T63,T30,T60,T31,T10;
 
-void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
+void Arm::ikine(){
   float dist=sqrt(ref_pose.x*ref_pose.x+ref_pose.y*ref_pose.y+ref_pose.z*ref_pose.z);//距离过大时，指向要达到的那个点
   float max_dist=0.99*(l1+l2);
   float control_x,control_y,control_z;
@@ -137,6 +137,11 @@ void Arm::ikine(Pose &ref_pose, Joint &ref_joint) {
     ref_joint.q[3] = atan2(T63.a21,-T63.a31);
     ref_joint.q[5] = atan2(T63.a12,T63.a13);
     ref_joint.q[4] = atan2(T63.a21,T63.a11*sin(ref_joint.q[3]));
+
+  ref_joint.q[1]*=-1;
+  ref_joint.q[2]*=-1;
+
+    for(int i=0; i<6; i++) ref_joint.q[i]*=57.295781;
 }
 
 #define ANGLE_INCREMENT 0.1
@@ -160,30 +165,56 @@ void Arm::updateRefPose() {
         ref_pose.roll=0;
     }
 }
+void Arm::get_joint(){
+  m1.control_data_.fdb_angle=math::degNormalize180(m1.control_data_.fdb_angle);
+  m2.control_data_.fdb_angle=math::degNormalize180(m2.control_data_.fdb_angle);
+  m3.control_data_.fdb_angle=math::degNormalize180(m3.control_data_.fdb_angle);
+  m4.control_data_.fdb_angle=math::degNormalize180(m4.control_data_.fdb_angle);
+  m5.control_data_.fdb_angle=math::degNormalize180(m5.control_data_.fdb_angle);
+  m6.control_data_.fdb_angle=math::degNormalize180(m6.control_data_.fdb_angle);
 
-Joint ref_joint;
+  arm_joint.q[0]=m1.control_data_.fdb_angle;
+  arm_joint.q[1]=m2.control_data_.fdb_angle;
+  arm_joint.q[2]=m3.control_data_.fdb_angle;
+  arm_joint.q[3]=m4.control_data_.fdb_angle;
+  arm_joint.q[4]=m5.control_data_.fdb_angle;
+  arm_joint.q[5]=m6.control_data_.fdb_angle;
+}
+
+void Arm::calc_ctrl_Joint(){
+    for (int i=0; i<6; i++) {
+      if(abs(arm_joint.q[i]-(ref_joint.q[i]-360))<abs(arm_joint.q[i]-ref_joint.q[i])) {
+        ctrl_joint.q[i]=ref_joint.q[i]-360;
+      }
+      else if(abs(arm_joint.q[i]-(ref_joint.q[i]+360))<abs(arm_joint.q[i]-ref_joint.q[i])) {
+        ctrl_joint.q[i]=ref_joint.q[i]+360;
+      }
+      else ctrl_joint.q[i]=ref_joint.q[i];
+    }
+}
+
+void Arm::set_joint_angle(){
+    m1.setAngle(ctrl_joint.q[0],0);
+    m2.setAngle(ctrl_joint.q[1],0);
+    m3.setAngle(ctrl_joint.q[2],0);
+    m4.setAngle(ctrl_joint.q[3],0);
+    m5.setAngle(ctrl_joint.q[4],0);
+    m6.setAngle(ctrl_joint.q[5],0);
+}
+
 void Arm::handle() {
 
     updateRefPose();
 
-    //由末端姿态得到1-6角度
+    get_joint();
 
-    ikine(ref_pose, ref_joint);
+    ikine();
 
-    //轨迹插值
-    // get_joint();
     // Trajectory ref_trajectory(arm_joint, ref_joint);
     // ref_trajectory.handle();
 
-    //设置角度
+    calc_ctrl_Joint();
 
-    for(int i=0; i<6; i++) ref_joint.q[i]*=57.295781;
-
-    m1.setAngle(ref_joint.q[0],0);
-    m2.setAngle(-ref_joint.q[1],0);
-    m3.setAngle(-ref_joint.q[2],0);
-    m4.setAngle(ref_joint.q[3],0);
-    m5.setAngle(ref_joint.q[4],0);
-    m6.setAngle(ref_joint.q[5],0);
+    set_joint_angle();
 }
 

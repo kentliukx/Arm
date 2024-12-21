@@ -29,7 +29,7 @@ public:
 class Arm {
 public:
     Motor &m1, &m2, &m3, &m4, &m5, &m6;
-    Joint arm_joint;
+    Joint arm_joint,ref_joint,ctrl_joint;
     Pose ref_pose;
     float l1=30, l2=30, l3=30;
     uint16_t can_id[6];
@@ -38,10 +38,11 @@ public:
         : m1(m1), m2(m2), m3(m3), m4(m4), m5(m5), m6(m6) {
     }
     void updateRefPose();
-    void rc_to_theta();
     void get_joint();
+    void calc_ctrl_Joint();
     void handle();
-    void ikine(Pose &ref_pose, Joint &ref_joint);
+    void ikine();
+    void set_joint_angle();
     void interpolate();
 };
 
