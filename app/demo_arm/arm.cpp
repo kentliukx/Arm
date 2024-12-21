@@ -136,7 +136,10 @@ void Arm::ikine(){
     //caculate X'Y'X' back
     ref_joint.q[3] = atan2(T63.a21,-T63.a31);
     ref_joint.q[5] = atan2(T63.a12,T63.a13);
-    ref_joint.q[4] = atan2(T63.a21,T63.a11*sin(ref_joint.q[3]));
+    ref_joint.q[4] = acos(T63.a11);
+
+
+
 
   ref_joint.q[1]*=-1;
   ref_joint.q[2]*=-1;
